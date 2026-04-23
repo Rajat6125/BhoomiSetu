@@ -22,7 +22,7 @@ if not SUPABASE_URL or not SUPABASE_KEY or not JWT_SECRET:
 supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
 app = Flask(__name__)
 CORS(app, origins=[
-    "https://bhoomisetu06.vercel.app"
+    "*"
 ])
 
 #OPTIONAL PROTECTED ROUTE DECORATOR -------------------- #

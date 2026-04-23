@@ -2,11 +2,15 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 <title>BhoomiSetu – Sign In</title>
 <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
-  * { margin: 0; padding: 0; box-sizing: border-box; }
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
 
   body {
     font-family: 'DM Sans', sans-serif;
@@ -17,6 +21,7 @@
     min-height: 100vh;
   }
 
+  /* --- PHONE CONTAINER: RECTANGLE (NO ROUNDED CORNERS) --- */
   .phone {
     width: 100%;
     max-width: 420px;
@@ -25,26 +30,38 @@
     background: #fff;
     overflow: hidden;
     position: relative;
-    box-shadow: 0 40px 100px rgba(0,0,0,0.5);
+    box-shadow: 0 40px 100px rgba(0, 0, 0, 0.5);
+    /* No border-radius applied — normal rectangle */
   }
 
+  /* Remove any rounded corners that previously existed on larger screens */
   @media (min-width: 480px) {
-    .phone { border-radius: 48px; }
+    .phone {
+      border-radius: 0; /* explicitly rectangle, no rounding */
+    }
   }
+
+  /* For extreme consistency, even if browser zooms, ensure 0 radius */
+  .phone {
+    border-radius: 0 !important;
+  }
+
   .top-section {
-  position: absolute;
-  top: 0; left: 0; right: 0;
-  height: 50%;
-  overflow: hidden; /* IMPORTANT */
-}
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 50%;
+    overflow: hidden;
+  }
 
   .top-section img {
-  width: 100%;
-  height: 110%; /* slight zoom to avoid gap */
-  object-fit: cover;
-  object-position: center top; /* FIX: prevents upward shift */
-  display: block;
-}
+    width: 100%;
+    height: 110%;
+    object-fit: cover;
+    object-position: center top;
+    display: block;
+  }
 
   .top-section::before {
     content: '';
@@ -52,26 +69,26 @@
     inset: 0;
     background: linear-gradient(
       to bottom,
-      rgba(0,0,0,0.50) 0%,
-      rgba(0,0,0,0.15) 55%,
-      rgba(0,0,0,0.0) 100%
+      rgba(0, 0, 0, 0.50) 0%,
+      rgba(0, 0, 0, 0.15) 55%,
+      rgba(0, 0, 0, 0.0) 100%
     );
     z-index: 1;
   }
 
   .logo {
-  position: absolute;
-  top: 22px;
-  left: 22px;
-  z-index: 3;
-}
+    position: absolute;
+    top: 22px;
+    left: 22px;
+    z-index: 3;
+  }
 
-.logo img {
-  height: 92px; /* adjust as needed */
-  width: auto;
-  object-fit: contain;
-  filter: drop-shadow(0 4px 12px rgba(0,0,0,0.4));
-}
+  .logo img {
+    height: 92px;
+    width: auto;
+    object-fit: contain;
+    filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.4));
+  }
 
   .wave-divider {
     position: absolute;
@@ -83,7 +100,9 @@
 
   .bottom-card {
     position: absolute;
-    bottom: 0; left: 0; right: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
     height: 52%;
     background: #fff;
     padding: 30px 30px 26px;
@@ -109,7 +128,9 @@
     margin-bottom: 22px;
   }
 
-  .field { margin-bottom: 14px; }
+  .field {
+    margin-bottom: 14px;
+  }
 
   .field-label {
     font-size: 11px;
@@ -129,9 +150,19 @@
     transition: border-color 0.2s;
   }
 
-  .input-wrap:focus-within { border-color: #e05a40; }
-  .input-wrap svg { flex-shrink: 0; color: #ccc; transition: color 0.2s; }
-  .input-wrap:focus-within svg { color: #e05a40; }
+  .input-wrap:focus-within {
+    border-color: #e05a40;
+  }
+
+  .input-wrap svg {
+    flex-shrink: 0;
+    color: #ccc;
+    transition: color 0.2s;
+  }
+
+  .input-wrap:focus-within svg {
+    color: #e05a40;
+  }
 
   .input-wrap input {
     flex: 1;
@@ -143,15 +174,23 @@
     background: transparent;
   }
 
-  .input-wrap input::placeholder { color: #d0c8c8; }
+  .input-wrap input::placeholder {
+    color: #d0c8c8;
+  }
 
   .eye-btn {
-    background: none; border: none;
-    cursor: pointer; color: #ccc;
-    display: flex; padding: 0;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #ccc;
+    display: flex;
+    padding: 0;
     transition: color 0.2s;
   }
-  .eye-btn:hover { color: #e05a40; }
+
+  .eye-btn:hover {
+    color: #e05a40;
+  }
 
   .extras {
     display: flex;
@@ -161,18 +200,32 @@
   }
 
   .remember {
-    display: flex; align-items: center;
-    gap: 7px; font-size: 12.5px;
-    color: #777; cursor: pointer; user-select: none;
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    font-size: 12.5px;
+    color: #777;
+    cursor: pointer;
+    user-select: none;
   }
-  .remember input[type=checkbox] { accent-color: #e05a40; width: 14px; height: 14px; }
+
+  .remember input[type="checkbox"] {
+    accent-color: #e05a40;
+    width: 14px;
+    height: 14px;
+  }
 
   .forgot {
-    font-size: 12.5px; color: #e05a40;
-    font-weight: 500; text-decoration: none;
+    font-size: 12.5px;
+    color: #e05a40;
+    font-weight: 500;
+    text-decoration: none;
     transition: opacity 0.15s;
   }
-  .forgot:hover { opacity: 0.7; }
+
+  .forgot:hover {
+    opacity: 0.7;
+  }
 
   .login-btn {
     width: 100%;
@@ -186,12 +239,19 @@
     font-weight: 700;
     letter-spacing: 0.06em;
     cursor: pointer;
-    box-shadow: 0 10px 28px rgba(224,90,64,0.40);
+    box-shadow: 0 10px 28px rgba(224, 90, 64, 0.40);
     transition: transform 0.15s, box-shadow 0.15s;
     margin-top: auto;
   }
-  .login-btn:hover  { transform: translateY(-2px); box-shadow: 0 14px 32px rgba(224,90,64,0.50); }
-  .login-btn:active { transform: translateY(0); }
+
+  .login-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 14px 32px rgba(224, 90, 64, 0.50);
+  }
+
+  .login-btn:active {
+    transform: translateY(0);
+  }
 
   .signup-text {
     text-align: center;
@@ -199,7 +259,17 @@
     font-size: 13px;
     color: #bbb;
   }
-  .signup-text a { color: #e05a40; font-weight: 600; text-decoration: none; }
+
+  .signup-text a {
+    color: #e05a40;
+    font-weight: 600;
+    text-decoration: none;
+  }
+
+  /* Keep perfect rectangle behavior, no overflow radius affecting content */
+  .phone, .top-section, .bottom-card {
+    border-radius: 0;
+  }
 </style>
 </head>
 <body>
@@ -207,26 +277,19 @@
 <div class="phone">
 
   <div class="top-section">
-  <img
-      src="Pic/Back_1.jpg"
-      alt="farmland background"
-    >
-
+    <img src="Pic/Back_1.jpg" alt="farmland background">
     <div class="logo">
-    <img src="Icon/Logo.png" alt="BhoomiSetu Logo">
+      <img src="Icon/Logo.png" alt="BhoomiSetu Logo">
     </div>
-
     <svg class="wave-divider"
          viewBox="0 0 420 60"
          xmlns="http://www.w3.org/2000/svg"
          preserveAspectRatio="none">
       <path d="M0,60 L0,32 Q105,-4 210,30 Q315,64 420,22 L420,60 Z" fill="#ffffff"/>
     </svg>
-
   </div>
 
   <div class="bottom-card">
-
     <h2>Sign in</h2>
     <div class="accent-line"></div>
 
@@ -253,7 +316,7 @@
           <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
         </svg>
         <input type="password" placeholder="enter your password" id="pwdInput">
-        <button class="eye-btn" onclick="togglePwd()" title="Show/hide">
+        <button class="eye-btn" type="button" onclick="togglePwd()" title="Show/hide">
           <svg id="eyeIcon" width="15" height="15" viewBox="0 0 24 24" fill="none"
                stroke="currentColor" stroke-width="1.8"
                stroke-linecap="round" stroke-linejoin="round">
@@ -276,7 +339,6 @@
     <div class="signup-text">
       Don't have an Account? <a href="#">Sign up</a>
     </div>
-
   </div>
 
 </div>
@@ -284,9 +346,13 @@
 <script>
   let visible = false;
   function togglePwd() {
+    const pwdField = document.getElementById('pwdInput');
+    const eyeSvg = document.getElementById('eyeIcon');
+    if (!pwdField || !eyeSvg) return;
     visible = !visible;
-    document.getElementById('pwdInput').type = visible ? 'text' : 'password';
-    document.getElementById('eyeIcon').style.opacity = visible ? '0.45' : '1';
+    pwdField.type = visible ? 'text' : 'password';
+    // subtle opacity style for better user feedback (unchanged functionality)
+    eyeSvg.style.opacity = visible ? '0.55' : '1';
   }
 </script>
 
