@@ -91,4 +91,41 @@ body{
 </div>
 
 </body>
+<script>
+document.querySelector(".btn").addEventListener("click", async function () {
+    const input = document.querySelector(".input-box").value.trim();
+
+    if (!input) {
+        alert("Please enter email or phone");
+        return;
+    }
+
+    try {
+        const response = await fetch("/check-user", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                phone_email: input
+            })
+        });
+
+        const data = await response.json();
+
+        // store value for auto-fill
+        localStorage.setItem("phone_email", input);
+
+        if (data.exists) {
+            window.location.href = "login.html";
+        } else {
+            window.location.href = "register.html";
+        }
+
+    } catch (err) {
+        console.error(err);
+        alert("Something went wrong. Try again.");
+    }
+});
+</script>
 </html>
