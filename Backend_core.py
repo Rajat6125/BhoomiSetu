@@ -15,7 +15,7 @@ SUPABASE_KEY = os.getenv("SUPABASE_KEY")
 JWT_SECRET = os.getenv("JWT_SECRET")
 
 if not SUPABASE_URL or not SUPABASE_KEY or not JWT_SECRET:
-    raise ValueError("Missing environment variables in .env file")
+    print("Environment variables missing - check Render settings")
 
 #APP SETUP -------------------- #
 supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
