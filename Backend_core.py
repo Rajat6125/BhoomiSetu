@@ -21,9 +21,18 @@ if not SUPABASE_URL or not SUPABASE_KEY or not JWT_SECRET:
 #APP SETUP -------------------- #
 supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
 app = Flask(__name__)
+<<<<<<< HEAD
 CORS(app, origins=[
     "*"
 ])
+=======
+CORS(app, resources={r"/*": {"origins": "*"}})
+@app.after_request
+def after_request(response):
+    response.headers.add('Access-Control-Allow-Headers', 'Content-Type,Authorization')
+    response.headers.add('Access-Control-Allow-Methods', 'GET,POST,OPTIONS')
+    return response
+>>>>>>> d18488a6938bc1bac3c0d6b3f310b6536744d4e8
 
 #OPTIONAL PROTECTED ROUTE DECORATOR -------------------- #
 def token_required(f):
