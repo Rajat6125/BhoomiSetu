@@ -1,5 +1,6 @@
 from flask import Flask, request, jsonify
 from supabase import create_client
+from flask_cors import CORS
 from dotenv import load_dotenv
 import os
 import jwt
@@ -15,12 +16,14 @@ SUPABASE_KEY = os.getenv("SUPABASE_KEY")
 JWT_SECRET = os.getenv("JWT_SECRET")
 
 if not SUPABASE_URL or not SUPABASE_KEY or not JWT_SECRET:
-    print("Environment variables missing - check Render settings")
+    raise ValueError("Missing environment variables in Render dashboard")
 
 #APP SETUP -------------------- #
 supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
 app = Flask(__name__)
-
+CORS(app, origins=[
+    "https://bhoomisetu06.vercel.app"
+])
 
 #OPTIONAL PROTECTED ROUTE DECORATOR -------------------- #
 def token_required(f):
