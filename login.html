@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BhoomiSetu – Sign In</title>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: #1a1a1a;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+  }
+
+  /* ── Outer wrapper ── */
+  .phone {
+    width: 100%;
+    max-width: 420px;
+    height: 100vh;
+    max-height: 820px;
+    background: #fff;
+    overflow: hidden;
+    position: relative;
+    box-shadow: 0 40px 100px rgba(0,0,0,0.5);
+  }
+
+  @media (min-width: 480px) {
+    .phone { border-radius: 48px; }
+  }
+
+  /* ════════════════════════════
+     TOP SECTION — full image
+  ════════════════════════════ */
+  .top-section {
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  height: 50%;
+  overflow: hidden; /* IMPORTANT */
+}
+
+  .top-section img {
+  width: 100%;
+  height: 110%; /* slight zoom to avoid gap */
+  object-fit: cover;
+  object-position: center top; /* FIX: prevents upward shift */
+  display: block;
+}
+
+  /* dark-to-transparent gradient overlay */
+  .top-section::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(
+      to bottom,
+      rgba(0,0,0,0.50) 0%,
+      rgba(0,0,0,0.15) 55%,
+      rgba(0,0,0,0.0) 100%
+    );
+    z-index: 1;
+  }
+
+  .logo {
+  position: absolute;
+  top: 22px;
+  left: 22px;
+  z-index: 3;
+}
+
+.logo img {
+  height: 92px; /* adjust as needed */
+  width: auto;
+  object-fit: contain;
+  filter: drop-shadow(0 4px 12px rgba(0,0,0,0.4));
+}
+  /* ── Single gentle wave: one up, one down ── */
+  .wave-divider {
+    position: absolute;
+    bottom: -1px;
+    left: 0;
+    width: 100%;
+    z-index: 2;
+  }
+
+  /* ════════════════════════════
+     BOTTOM CARD
+  ════════════════════════════ */
+  .bottom-card {
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 52%;
+    background: #fff;
+    padding: 30px 30px 26px;
+    display: flex;
+    flex-direction: column;
+  }
+
+  h2 {
+    font-family: 'Sora', sans-serif;
+    font-size: 27px;
+    font-weight: 700;
+    color: #111;
+    margin-top: 0.5px;
+    margin-bottom: 5px;
+    letter-spacing: -0.4px;
+  }
+
+  .accent-line {
+    width: 32px;
+    height: 3px;
+    background: linear-gradient(90deg, #e05a40, #f0845a);
+    border-radius: 2px;
+    margin-bottom: 22px;
+  }
+
+  /* ── Input field ── */
+  .field { margin-bottom: 14px; }
+
+  .field-label {
+    font-size: 11px;
+    font-weight: 500;
+    color: #999;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    margin-bottom: 5px;
+  }
+
+  .input-wrap {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    border-bottom: 1.5px solid #ebebeb;
+    padding: 8px 2px;
+    transition: border-color 0.2s;
+  }
+
+  .input-wrap:focus-within { border-color: #e05a40; }
+  .input-wrap svg { flex-shrink: 0; color: #ccc; transition: color 0.2s; }
+  .input-wrap:focus-within svg { color: #e05a40; }
+
+  .input-wrap input {
+    flex: 1;
+    border: none;
+    outline: none;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    color: #222;
+    background: transparent;
+  }
+
+  .input-wrap input::placeholder { color: #d0c8c8; }
+
+  .eye-btn {
+    background: none; border: none;
+    cursor: pointer; color: #ccc;
+    display: flex; padding: 0;
+    transition: color 0.2s;
+  }
+  .eye-btn:hover { color: #e05a40; }
+
+  /* ── Extras row ── */
+  .extras {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 14px 0 20px;
+  }
+
+  .remember {
+    display: flex; align-items: center;
+    gap: 7px; font-size: 12.5px;
+    color: #777; cursor: pointer; user-select: none;
+  }
+  .remember input[type=checkbox] { accent-color: #e05a40; width: 14px; height: 14px; }
+
+  .forgot {
+    font-size: 12.5px; color: #e05a40;
+    font-weight: 500; text-decoration: none;
+    transition: opacity 0.15s;
+  }
+  .forgot:hover { opacity: 0.7; }
+
+  /* ── Login CTA ── */
+  .login-btn {
+    width: 100%;
+    padding: 15px;
+    border: none;
+    border-radius: 16px;
+    background: linear-gradient(135deg, #e05a40 0%, #f08060 100%);
+    color: #fff;
+    font-family: 'Sora', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    cursor: pointer;
+    box-shadow: 0 10px 28px rgba(224,90,64,0.40);
+    transition: transform 0.15s, box-shadow 0.15s;
+    margin-top: auto;
+  }
+  .login-btn:hover  { transform: translateY(-2px); box-shadow: 0 14px 32px rgba(224,90,64,0.50); }
+  .login-btn:active { transform: translateY(0); }
+
+  /* ── Footer ── */
+  .signup-text {
+    text-align: center;
+    margin-top: 14px;
+    font-size: 13px;
+    color: #bbb;
+  }
+  .signup-text a { color: #e05a40; font-weight: 600; text-decoration: none; }
+</style>
+</head>
+<body>
+
+<div class="phone">
+
+  <!-- ══ TOP: full-bleed photo ══ -->
+  <div class="top-section">
+
+    <!--
+      TO USE YOUR LOCAL IMAGE:
+      Replace the src below with your path, e.g.  src="Pic/Back_4.jpg"
+    -->
+    <img
+      src="Pic/Back_1.jpg"
+      alt="farmland background"
+    >
+
+    <!-- App branding -->
+    <div class="logo">
+    <img src="Icon/Logo.png" alt="BhoomiSetu Logo">
+    </div>
+
+    <!--
+      Wave: exactly ONE peak (left side rises) and ONE valley (right side dips).
+      Simple, clean, not wavy.
+    -->
+    <svg class="wave-divider"
+         viewBox="0 0 420 60"
+         xmlns="http://www.w3.org/2000/svg"
+         preserveAspectRatio="none">
+      <path d="M0,60 L0,32 Q105,-4 210,30 Q315,64 420,22 L420,60 Z" fill="#ffffff"/>
+    </svg>
+
+  </div>
+
+  <!-- ══ BOTTOM: login form ══ -->
+  <div class="bottom-card">
+
+    <h2>Sign in</h2>
+    <div class="accent-line"></div>
+
+    <div class="field">
+      <div class="field-label">Email</div>
+      <div class="input-wrap">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none"
+             stroke="currentColor" stroke-width="1.8"
+             stroke-linecap="round" stroke-linejoin="round">
+          <rect x="2" y="4" width="20" height="16" rx="2"/>
+          <path d="M2 7l10 7 10-7"/>
+        </svg>
+        <input type="email" placeholder="demo@email.com">
+      </div>
+    </div>
+
+    <div class="field">
+      <div class="field-label">Password</div>
+      <div class="input-wrap">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none"
+             stroke="currentColor" stroke-width="1.8"
+             stroke-linecap="round" stroke-linejoin="round">
+          <rect x="3" y="11" width="18" height="11" rx="2"/>
+          <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
+        </svg>
+        <input type="password" placeholder="enter your password" id="pwdInput">
+        <button class="eye-btn" onclick="togglePwd()" title="Show/hide">
+          <svg id="eyeIcon" width="15" height="15" viewBox="0 0 24 24" fill="none"
+               stroke="currentColor" stroke-width="1.8"
+               stroke-linecap="round" stroke-linejoin="round">
+            <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+            <circle cx="12" cy="12" r="3"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <div class="extras">
+      <label class="remember">
+        <input type="checkbox" checked> Remember Me
+      </label>
+      <a class="forgot" href="#">Forgot Password?</a>
+    </div>
+
+    <button class="login-btn">Login</button>
+
+    <div class="signup-text">
+      Don't have an Account? <a href="#">Sign up</a>
+    </div>
+
+  </div>
+
+</div>
+
+<script>
+  let visible = false;
+  function togglePwd() {
+    visible = !visible;
+    document.getElementById('pwdInput').type = visible ? 'text' : 'password';
+    document.getElementById('eyeIcon').style.opacity = visible ? '0.45' : '1';
+  }
+</script>
+
+</body>
+</html>
