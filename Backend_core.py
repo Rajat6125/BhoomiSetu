@@ -106,6 +106,39 @@ def register():
             "error": str(e)
         }), 500
 
+# -------------------- CHECK USER EXISTS -------------------- #
+@app.route('/check-user', methods=['POST'])
+def check_user():
+    try:
+        data = request.get_json()
+
+        if "phone_email" not in data or not data["phone_email"]:
+            return jsonify({"message": "phone_email is required"}), 400
+
+        user = (
+            supabase
+            .table("users")
+            .select("user_id")
+            .eq("phone_email", data["phone_email"])
+            .execute()
+        )
+
+        if user.data:
+            return jsonify({
+                "exists": True,
+                "message": "User found"
+            }), 200
+        else:
+            return jsonify({
+                "exists": False,
+                "message": "User not found"
+            }), 404
+
+    except Exception as e:
+        return jsonify({
+            "success": False,
+            "error": str(e)
+        }), 500
 
 # -------------------- LOGIN -------------------- #
 @app.route('/login', methods=['POST'])

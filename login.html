@@ -17,7 +17,6 @@
     min-height: 100vh;
   }
 
-  /* ── Outer wrapper ── */
   .phone {
     width: 100%;
     max-width: 420px;
@@ -32,10 +31,6 @@
   @media (min-width: 480px) {
     .phone { border-radius: 48px; }
   }
-
-  /* ════════════════════════════
-     TOP SECTION — full image
-  ════════════════════════════ */
   .top-section {
   position: absolute;
   top: 0; left: 0; right: 0;
@@ -51,7 +46,6 @@
   display: block;
 }
 
-  /* dark-to-transparent gradient overlay */
   .top-section::before {
     content: '';
     position: absolute;
@@ -78,7 +72,7 @@
   object-fit: contain;
   filter: drop-shadow(0 4px 12px rgba(0,0,0,0.4));
 }
-  /* ── Single gentle wave: one up, one down ── */
+
   .wave-divider {
     position: absolute;
     bottom: -1px;
@@ -87,9 +81,6 @@
     z-index: 2;
   }
 
-  /* ════════════════════════════
-     BOTTOM CARD
-  ════════════════════════════ */
   .bottom-card {
     position: absolute;
     bottom: 0; left: 0; right: 0;
@@ -118,7 +109,6 @@
     margin-bottom: 22px;
   }
 
-  /* ── Input field ── */
   .field { margin-bottom: 14px; }
 
   .field-label {
@@ -163,7 +153,6 @@
   }
   .eye-btn:hover { color: #e05a40; }
 
-  /* ── Extras row ── */
   .extras {
     display: flex;
     justify-content: space-between;
@@ -185,7 +174,6 @@
   }
   .forgot:hover { opacity: 0.7; }
 
-  /* ── Login CTA ── */
   .login-btn {
     width: 100%;
     padding: 15px;
@@ -205,7 +193,6 @@
   .login-btn:hover  { transform: translateY(-2px); box-shadow: 0 14px 32px rgba(224,90,64,0.50); }
   .login-btn:active { transform: translateY(0); }
 
-  /* ── Footer ── */
   .signup-text {
     text-align: center;
     margin-top: 14px;
@@ -219,27 +206,16 @@
 
 <div class="phone">
 
-  <!-- ══ TOP: full-bleed photo ══ -->
   <div class="top-section">
-
-    <!--
-      TO USE YOUR LOCAL IMAGE:
-      Replace the src below with your path, e.g.  src="Pic/Back_4.jpg"
-    -->
-    <img
+  <img
       src="Pic/Back_1.jpg"
       alt="farmland background"
     >
 
-    <!-- App branding -->
     <div class="logo">
     <img src="Icon/Logo.png" alt="BhoomiSetu Logo">
     </div>
 
-    <!--
-      Wave: exactly ONE peak (left side rises) and ONE valley (right side dips).
-      Simple, clean, not wavy.
-    -->
     <svg class="wave-divider"
          viewBox="0 0 420 60"
          xmlns="http://www.w3.org/2000/svg"
@@ -249,7 +225,6 @@
 
   </div>
 
-  <!-- ══ BOTTOM: login form ══ -->
   <div class="bottom-card">
 
     <h2>Sign in</h2>
