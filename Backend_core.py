@@ -21,13 +21,7 @@ if not SUPABASE_URL or not SUPABASE_KEY or not JWT_SECRET:
 #APP SETUP -------------------- #
 supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
 app = Flask(__name__)
-CORS(app, resources={
-    r"/*": {
-        "origins": [
-            "https://bhoomi-setu06.vercel.app"
-        ]
-    }
-})
+CORS(app, resources={r"/*": {"origins": "*"}})
 @app.after_request
 def after_request(response):
     response.headers.add('Access-Control-Allow-Headers', 'Content-Type,Authorization')
