@@ -22,7 +22,7 @@ if not SUPABASE_URL or not SUPABASE_KEY or not JWT_SECRET:
 #APP SETUP -------------------- #
 supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
 app = Flask(__name__)
-<<<<<<< HEAD
+
 CORS(app, origins=[
     "*"
 ])
