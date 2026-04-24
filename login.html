@@ -2,300 +2,289 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 <title>BhoomiSetu – Sign In</title>
 <link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
 <style>
-  * {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  :root {
+    --brand: #e05a40;
+    --brand-light: #f08060;
   }
 
   body {
     font-family: 'DM Sans', sans-serif;
-    /* match main page background: clean white, consistent with first page */
-    background: #ffffff;
+    background: #1a1a1a;
     display: flex;
     justify-content: center;
     align-items: center;
     min-height: 100vh;
-    margin: 0;
-    padding: 0;
+    overflow: hidden;
   }
 
-  /* --- PHONE CONTAINER: WIDTH MATCHES MAIN PAGE INTERACTIVE COLUMN ---
-     Main page: input & button have max-width: 350px, centered.
-     To make login page input fields EXACTLY 350px wide (same as main page),
-     we set .phone max-width = 350px + left/right padding of bottom-card (30px each) = 410px.
-     This ensures inner .input-wrap width = 350px, pixel-perfect consistency.
-     No rounded corners — sharp rectangle, same visual language.
-  */
+  /* ── Phone Shell ── */
   .phone {
     width: 100%;
-    max-width: 410px;          /* → gives inner field width = 410-60 = 350px */
+    max-width: 410px;
     height: 100vh;
     max-height: 820px;
     background: #fff;
     overflow: hidden;
     position: relative;
-    box-shadow: 0 40px 100px rgba(0, 0, 0, 0.12); /* softer shadow, elegant like main page */
-    border-radius: 0 !important;  /* strict rectangle — no rounding, matching main page edges */
+    box-shadow: 0 40px 100px rgba(0,0,0,0.5);
   }
-
-  /* even on larger screens — ensure rectangle */
   @media (min-width: 480px) {
-    .phone {
-      border-radius: 0;
-    }
+    .phone { border-radius: 48px; height: 780px; margin: 20px auto; }
   }
 
-  /* top image section — covers upper area */
+  /* ── Hero ── */
   .top-section {
     position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
+    top: 0; left: 0; right: 0;
     height: 50%;
     overflow: hidden;
   }
-
   .top-section img {
-    width: 100%;
-    height: 110%;
-    object-fit: cover;
-    object-position: center top;
+    width: 100%; height: 110%;
+    object-fit: cover; object-position: center top;
     display: block;
+    animation: subtle-zoom 14s ease-in-out infinite alternate;
+    transform-origin: center;
   }
-
+  @keyframes subtle-zoom {
+    from { transform: scale(1);    }
+    to   { transform: scale(1.06); }
+  }
   .top-section::before {
     content: '';
-    position: absolute;
-    inset: 0;
+    position: absolute; inset: 0;
     background: linear-gradient(
       to bottom,
-      rgba(0, 0, 0, 0.50) 0%,
-      rgba(0, 0, 0, 0.15) 55%,
-      rgba(0, 0, 0, 0.0) 100%
+      rgba(0,0,0,0.50) 0%,
+      rgba(0,0,0,0.15) 55%,
+      rgba(0,0,0,0.00) 100%
     );
     z-index: 1;
   }
 
+  /* ── Logo ── */
   .logo {
     position: absolute;
-    top: 22px;
-    left: 22px;
+    top: 22px; left: 22px;
+    z-index: 3;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .logo img {
+    height: 92px; width: auto;
+    object-fit: contain;
+    filter: drop-shadow(0 4px 12px rgba(0,0,0,0.4));
+  }
+  .logo-fallback {
+    font-family: 'Sora', sans-serif;
+    font-size: 18px; font-weight: 700;
+    color: #fff;
+    text-shadow: 0 2px 8px rgba(0,0,0,0.5);
+    display: none;
+  }
+
+  /* ── Wave ── */
+  .wave-wrap {
+    position: absolute;
+    left: 0; right: 0;
+    bottom: calc(50% - 2px);
+    z-index: 2;
+    line-height: 0;
+  }
+  .wave-wrap svg {
+    display: block;
+    width: 100%; height: 52px;
+  }
+
+  /* ── Bottom Card ── */
+  .bottom-card {
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 52%;
+    background: #fff;
+    padding: 26px 28px 24px;
+    display: flex;
+    flex-direction: column;
     z-index: 3;
   }
 
-  .logo img {
-    height: 92px;
-    width: auto;
-    object-fit: contain;
-    filter: drop-shadow(0 4px 12px rgba(0, 0, 0, 0.4));
+  /* dot-grid texture */
+  .bottom-card::before {
+    content: '';
+    position: absolute; inset: 0;
+    background-image: radial-gradient(circle, #d8d8d8 1px, transparent 1px);
+    background-size: 20px 20px;
+    opacity: 0.25;
+    pointer-events: none;
+    z-index: 0;
   }
-
-  .wave-divider {
-    position: absolute;
-    bottom: -1px;
-    left: 0;
-    width: 100%;
-    z-index: 2;
-  }
-
-  .bottom-card {
-    position: absolute;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    height: 52%;
-    background: #fff;
-    padding: 30px 30px 26px;
-    display: flex;
-    flex-direction: column;
-  }
+  .bottom-card > * { position: relative; z-index: 1; }
 
   h2 {
     font-family: 'Sora', sans-serif;
-    font-size: 27px;
-    font-weight: 700;
-    color: #111;
-    margin-top: 0.5px;
+    font-size: 26px; font-weight: 700;
+    color: #111; letter-spacing: -0.4px;
     margin-bottom: 5px;
-    letter-spacing: -0.4px;
+    animation: fadeUp 0.35s ease both 0.05s;
   }
 
   .accent-line {
-    width: 32px;
-    height: 3px;
-    background: linear-gradient(90deg, #e05a40, #f0845a);
+    width: 32px; height: 3px;
+    background: linear-gradient(90deg, var(--brand), var(--brand-light));
     border-radius: 2px;
     margin-bottom: 22px;
+    animation: fadeUp 0.35s ease both 0.08s;
   }
 
+  /* ── Fields ── */
   .field {
     margin-bottom: 14px;
+    animation: fadeUp 0.3s ease both;
   }
+  .field:nth-child(3) { animation-delay: 0.12s; }
+  .field:nth-child(4) { animation-delay: 0.17s; }
 
   .field-label {
-    font-size: 11px;
-    font-weight: 500;
-    color: #999;
-    letter-spacing: 0.08em;
+    font-size: 10.5px; font-weight: 700;
+    color: #504b49;           
+    letter-spacing: 0.09em;
     text-transform: uppercase;
     margin-bottom: 5px;
   }
 
   .input-wrap {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    border-bottom: 1.5px solid #ebebeb;
+    display: flex; align-items: center; gap: 10px;
+    border-bottom: 1.5px solid #ddd;
     padding: 8px 2px;
     transition: border-color 0.2s;
-    width: 100%;
   }
-
-  .input-wrap:focus-within {
-    border-color: #e05a40;
-  }
-
-  .input-wrap svg {
-    flex-shrink: 0;
-    color: #ccc;
-    transition: color 0.2s;
-  }
-
-  .input-wrap:focus-within svg {
-    color: #e05a40;
-  }
+  .input-wrap:focus-within { border-color: var(--brand); }
+  .input-wrap svg { flex-shrink: 0; color: #a09898; transition: color 0.2s; }
+  .input-wrap:focus-within svg { color: var(--brand); }
 
   .input-wrap input {
-    flex: 1;
-    border: none;
-    outline: none;
+    flex: 1; border: none; outline: none;
     font-family: 'DM Sans', sans-serif;
-    font-size: 14px;
-    color: #222;
-    background: transparent;
-    width: 100%;
+    font-size: 14px; color: #817a7a;
+    background: transparent; width: 100%;
   }
-
-  .input-wrap input::placeholder {
-    color: #d0c8c8;
-  }
+  .input-wrap input::placeholder { color: #6b6262; }
 
   .eye-btn {
-    background: none;
-    border: none;
-    cursor: pointer;
-    color: #ccc;
-    display: flex;
-    padding: 0;
+    background: none; border: none; cursor: pointer;
+    color: #aaa; display: flex; padding: 0;
     transition: color 0.2s;
   }
-
-  .eye-btn:hover {
-    color: #e05a40;
-  }
+  .eye-btn:hover { color: var(--brand); }
 
   .extras {
     display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin: 14px 0 20px;
+    justify-content: space-between; align-items: center;
+    margin: 12px 0 18px;
+    animation: fadeUp 0.3s ease both 0.21s;
   }
 
   .remember {
-    display: flex;
-    align-items: center;
-    gap: 7px;
-    font-size: 12.5px;
-    color: #777;
-    cursor: pointer;
-    user-select: none;
+    display: flex; align-items: center; gap: 7px;
+    font-size: 12.5px; color: #777;
+    cursor: pointer; user-select: none;
   }
-
   .remember input[type="checkbox"] {
-    accent-color: #e05a40;
-    width: 14px;
-    height: 14px;
+    accent-color: var(--brand);
+    width: 14px; height: 14px;
   }
 
   .forgot {
-    font-size: 12.5px;
-    color: #e05a40;
-    font-weight: 500;
-    text-decoration: none;
+    font-size: 12.5px; color: var(--brand);
+    font-weight: 600; text-decoration: none;
     transition: opacity 0.15s;
   }
+  .forgot:hover { opacity: 0.7; }
 
-  .forgot:hover {
-    opacity: 0.7;
+  .field-error {
+    font-size: 10px; color: var(--brand);
+    font-weight: 700; margin-top: 3px;
+    display: none; line-height: 1.2;
   }
+  .field-error.show { display: block; }
 
+  /* ── Login button ── */
   .login-btn {
-    width: 100%;
-    padding: 15px;
-    border: none;
-    border-radius: 16px;
-    background: linear-gradient(135deg, #e05a40 0%, #f08060 100%);
+    width: 100%; padding: 10px;
+    border: none; border-radius: 16px;
+    background: linear-gradient(135deg, var(--brand) 0%, var(--brand-light) 100%);
     color: #fff;
     font-family: 'Sora', sans-serif;
-    font-size: 15px;
-    font-weight: 700;
-    letter-spacing: 0.06em;
-    cursor: pointer;
-    box-shadow: 0 10px 28px rgba(224, 90, 64, 0.40);
-    transition: transform 0.15s, box-shadow 0.15s;
+    font-size: 15px; font-weight: 700;
+    letter-spacing: 0.06em; cursor: pointer;
+    box-shadow: 0 10px 28px rgba(224,90,64,0.40);
+    transition: transform 0.15s, box-shadow 0.15s, opacity 0.15s;
     margin-top: auto;
+    overflow: hidden; position: relative;
+    animation: fadeUp 0.3s ease both 0.25s;
   }
-
-  .login-btn:hover {
-    transform: translateY(-2px);
-    box-shadow: 0 14px 32px rgba(224, 90, 64, 0.50);
+  /* shimmer on hover */
+  .login-btn::after {
+    content: '';
+    position: absolute; top: 0; left: -80%;
+    width: 60%; height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.22), transparent);
+    transform: skewX(-15deg);
+    transition: left 0.5s ease;
   }
-
-  .login-btn:active {
-    transform: translateY(0);
-  }
+  .login-btn:hover::after { left: 130%; }
+  .login-btn:hover  { transform: translateY(-2px); box-shadow: 0 14px 32px rgba(224,90,64,0.50); }
+  .login-btn:active { transform: translateY(0); }
+  .login-btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
 
   .signup-text {
     text-align: center;
     margin-top: 14px;
-    font-size: 13px;
-    color: #bbb;
+    font-size: 13px; color: #999;
+    animation: fadeUp 0.3s ease both 0.28s;
   }
-
   .signup-text a {
-    color: #e05a40;
-    font-weight: 600;
+    color: var(--brand); font-weight: 700;
     text-decoration: none;
   }
+  .signup-text a:hover { text-decoration: underline; }
 
-  /* keep rectangle edges even for inner elements */
-  .phone, .top-section, .bottom-card {
-    border-radius: 0;
+  /* ── Toast ── */
+  .toast {
+    position: fixed; bottom: 24px; left: 50%;
+    transform: translateX(-50%) translateY(10px);
+    padding: 10px 22px; border-radius: 40px;
+    font-size: 12.5px; font-weight: 600;
+    color: #fff; white-space: nowrap;
+    z-index: 999; opacity: 0;
+    transition: opacity 0.25s, transform 0.25s;
+    pointer-events: none;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.25);
+  }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+  .toast.success { background: #2c7a4a; }
+  .toast.error   { background: #c0392b; }
+  .toast.info    { background: #2563a8; }
+
+  /* ── Spinner ── */
+  @keyframes spin { to { transform: rotate(360deg); } }
+  .spinner {
+    display: inline-block; width: 15px; height: 15px;
+    border: 2px solid rgba(255,255,255,0.35);
+    border-top-color: #fff; border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+    vertical-align: middle; margin-right: 6px;
   }
 
-  /* small adjustment for very narrow devices (below 410px): full-width, inner fields shrink gracefully, 
-     but main page behavior also shrinks — consistent responsiveness */
-  @media (max-width: 410px) {
-    .phone {
-      max-width: 100%;
-    }
-    .bottom-card {
-      padding: 28px 20px 24px;
-    }
-    /* preserve input width relative to new padding, but still inside container */
-    .input-wrap {
-      gap: 6px;
-    }
-  }
-
-  /* no overflow issues */
-  body {
-    overflow-x: hidden;
+  /* ── Animations ── */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(7px); }
+    to   { opacity: 1; transform: translateY(0); }
   }
 </style>
 </head>
@@ -304,136 +293,185 @@
 <div class="phone">
 
   <div class="top-section">
-    <img src="Pic/Back_1.jpg" alt="farmland background">
+    <img src="Pic/Back_1.jpg" alt="Farm landscape" id="bgImg">
     <div class="logo">
-      <img src="Icon/Logo.png" alt="BhoomiSetu Logo">
+      <img src="Icon/Logo.png" alt="BhoomiSetu" id="logoImg">
+      <span class="logo-fallback" id="logoFallback">BhoomiSetu</span>
     </div>
-    <svg class="wave-divider"
-         viewBox="0 0 420 60"
-         xmlns="http://www.w3.org/2000/svg"
-         preserveAspectRatio="none">
-      <path d="M0,60 L0,32 Q105,-4 210,30 Q315,64 420,22 L420,60 Z" fill="#ffffff"/>
+  </div>
+
+  <div class="wave-wrap">
+    <svg viewBox="0 0 410 52" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M0,52 L0,30 Q68,4 137,20 Q205,36 273,16 Q341,-4 410,24 L410,52 Z" fill="#ffffff"/>
     </svg>
   </div>
 
   <div class="bottom-card">
-    <h2>Sign in</h2>
+    <h2>Sign In </h2>
     <div class="accent-line"></div>
 
     <div class="field">
-      <div class="field-label">Email</div>
+      <div class="field-label">Email / Phone</div>
       <div class="input-wrap">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none"
-             stroke="currentColor" stroke-width="1.8"
-             stroke-linecap="round" stroke-linejoin="round">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
           <rect x="2" y="4" width="20" height="16" rx="2"/>
           <path d="M2 7l10 7 10-7"/>
         </svg>
-        <input type="email" placeholder="demo@email.com" id="emailInput">
+        <input type="text" id="emailInput" placeholder="demo@email.com or +91XXXXXXXXXX" autocomplete="username">
       </div>
+      <span class="field-error" id="err-email"></span>
     </div>
 
     <div class="field">
       <div class="field-label">Password</div>
       <div class="input-wrap">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none"
-             stroke="currentColor" stroke-width="1.8"
-             stroke-linecap="round" stroke-linejoin="round">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
           <rect x="3" y="11" width="18" height="11" rx="2"/>
           <path d="M7 11V7a5 5 0 0 1 10 0v4"/>
         </svg>
-        <input type="password" placeholder="enter your password" id="pwdInput">
-        <button class="eye-btn" type="button" onclick="togglePwd()" title="Show/hide">
-          <svg id="eyeIcon" width="15" height="15" viewBox="0 0 24 24" fill="none"
-               stroke="currentColor" stroke-width="1.8"
-               stroke-linecap="round" stroke-linejoin="round">
+        <input type="password" id="pwdInput" placeholder="Enter your password" autocomplete="current-password">
+        <button class="eye-btn" type="button" id="togglePwdBtn" aria-label="Toggle password">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
             <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
             <circle cx="12" cy="12" r="3"/>
           </svg>
         </button>
       </div>
+      <span class="field-error" id="err-pwd"></span>
     </div>
 
     <div class="extras">
       <label class="remember">
-        <input type="checkbox" checked> Remember Me
+        <input type="checkbox" id="rememberCheckbox" checked> Remember Me
       </label>
-      <a class="forgot" href="#">Forgot Password?</a>
+      <a class="forgot" href="#" id="forgotLink">Forgot Password?</a>
     </div>
 
     <button class="login-btn" id="loginBtn">Login</button>
 
     <div class="signup-text">
-      Don't have an Account? <a href="#" id="signupRedirect">Sign up</a>
+      Don't have an account? <a href="register.html">Sign up</a>
     </div>
   </div>
 
 </div>
 
-<script>
-  // Toggle password visibility (preserve original functionality)
-  let visible = false;
-  function togglePwd() {
-    const pwdField = document.getElementById('pwdInput');
-    const eyeSvg = document.getElementById('eyeIcon');
-    if (!pwdField || !eyeSvg) return;
-    visible = !visible;
-    pwdField.type = visible ? 'text' : 'password';
-    eyeSvg.style.opacity = visible ? '0.55' : '1';
-  }
+<div class="toast" id="toast"></div>
 
-  // Graceful handling: if user had entered email on previous page, 
-  // prefill email from localStorage (consistent UX)
-  (function autoFillFromStorage() {
-    try {
-      const storedContact = localStorage.getItem("phone_email");
-      const emailInput = document.getElementById("emailInput");
-      if (storedContact && emailInput && !emailInput.value) {
-        // if stored value looks like email or phone, fill as a convenience
-        emailInput.value = storedContact;
-      }
-    } catch(e) { /* fail silently */ }
+<script>
+  const API_BASE = "https://bhoomisetu-t4nw.onrender.com";
+  
+  document.getElementById('bgImg').onerror = function() {
+    this.src = 'https://images.pexels.com/photos/1595108/pexels-photo-1595108.jpeg?auto=compress&cs=tinysrgb&w=600';
+  };
+  document.getElementById('logoImg').onerror = function() {
+    this.style.display = 'none';
+    document.getElementById('logoFallback').style.display = 'block';
+  };
+
+  (function checkExistingSession() {
+    const token = localStorage.getItem('bhoomisetu_token') || sessionStorage.getItem('bhoomisetu_token');
+    if (token && token.split('.').length === 3) {
+     window.location.href = 'main.html';
+    }
   })();
 
-  // Simple login simulation (matches original structure but with width alignment only)
-  // Provides smooth navigation feel, consistent with main page redirect flow.
-  // For demo integrity: we are not overriding backend but keep local behavior.
-  document.getElementById("loginBtn").addEventListener("click", function(e) {
-    const email = document.getElementById("emailInput").value.trim();
-    const pwd = document.getElementById("pwdInput").value;
-    if (!email || !pwd) {
-      alert("Please enter both email and password.");
-      return;
-    }
-    // Note: In a full stack, you'd call your authentication endpoint.
-    // For design consistency, we just present success message and prevent errors.
-    // (Original login.html had no specific fetch, but we add demo redirection similar to main page? 
-    // but to keep just width fix we only show feedback. However to keep parity with the main page's 
-    // interactive style, we simulate a simple auth awareness. But since requirement is “same width” 
-    // I'm not altering backend expectations, but enhance clarity.)
-    alert("Demo mode: Sign in successful. (Integrate your auth endpoint)");
-    // Example: window.location.href = "dashboard.html"; // optional if needed
+  document.getElementById('togglePwdBtn').addEventListener('click', function() {
+    const inp = document.getElementById('pwdInput');
+    inp.type = inp.type === 'password' ? 'text' : 'password';
+    this.style.opacity = inp.type === 'text' ? '0.4' : '1';
   });
 
-  // make "Sign up" link point to register page or main page (preserve consistency)
-  document.getElementById("signupRedirect").addEventListener("click", function(e) {
+  function showToast(msg, type = 'error') {
+    const t = document.getElementById('toast');
+    t.textContent = msg;
+    t.className = `toast ${type} show`;
+    setTimeout(() => { t.className = 'toast'; }, 3500);
+  }
+
+  function setError(id, msg) {
+    const el = document.getElementById(id);
+    el.textContent = msg;
+    el.classList.toggle('show', !!msg);
+  }
+  function clearErrors() {
+    setError('err-email', '');
+    setError('err-pwd', '');
+  }
+
+  function setLoading(on) {
+    const btn = document.getElementById('loginBtn');
+    btn.disabled = on;
+    btn.innerHTML = on ? '<span class="spinner"></span>Signing in…' : 'Login';
+  }
+
+  document.getElementById('forgotLink').addEventListener('click', function(e) {
     e.preventDefault();
-    // If register.html exists from main flow, redirect there
-    window.location.href = "register.html";
+    showToast('Contact support@bhoomisetu.com to reset your password.', 'info');
   });
 
-  // Additional: Prevent accidental form submit on enter key
-  const inputs = document.querySelectorAll('.input-wrap input');
-  inputs.forEach(input => {
-    input.addEventListener('keypress', function(e) {
-      if (e.key === 'Enter') {
-        e.preventDefault();
-        document.getElementById("loginBtn").click();
+  async function handleLogin() {
+    clearErrors();
+
+    const phone_email = document.getElementById('emailInput').value.trim();
+    const password    = document.getElementById('pwdInput').value;
+    const remember    = document.getElementById('rememberCheckbox').checked;
+
+    if (!phone_email) { setError('err-email', 'Required'); return; }
+    if (!password)    { setError('err-pwd',   'Required'); return; }
+
+    setLoading(true);
+
+    try {
+      const res  = await fetch(`${API_BASE}/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ phone_email, password })
+      });
+      const data = await res.json();
+
+      if (res.status === 200 && data.success && data.token) {
+        const store = remember ? localStorage : sessionStorage;
+        store.setItem('bhoomisetu_token', data.token);
+        store.setItem('bhoomisetu_user',  phone_email);
+        sessionStorage.setItem('just_logged_in', 'true');
+
+        showToast('Login successful! Redirecting…', 'success');
+        setTimeout(() => { window.location.href = 'main.html'; }, 1200);
+
+      } else if (res.status === 401) {
+        setError('err-pwd', 'Wrong password');
+        showToast(data.message || 'Incorrect password. Try again.', 'error');
+
+      } else if (res.status === 404) {
+        setError('err-email', 'No account found');
+        showToast('No account found. Redirecting to Sign Up…', 'error');
+        setTimeout(() => { window.location.href = 'signup.html'; }, 2000);
+
+      } else {
+        showToast(data.message || data.error || 'Login failed. Try again.', 'error');
       }
+
+    } catch (err) {
+      console.error('Login error:', err);
+      showToast('Network error — is the server running?', 'error');
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  document.getElementById('loginBtn').addEventListener('click', handleLogin);
+
+  ['emailInput', 'pwdInput'].forEach(id => {
+    document.getElementById(id).addEventListener('keydown', e => {
+      if (e.key === 'Enter') handleLogin();
     });
   });
+
+  (function prefill() {
+    const stored = localStorage.getItem('bhoomisetu_user') || sessionStorage.getItem('bhoomisetu_user');
+    if (stored) document.getElementById('emailInput').value = stored;
+  })();
 </script>
-
-
 </body>
 </html>

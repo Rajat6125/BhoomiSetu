@@ -473,7 +473,7 @@
 
       if (res.status === 201 && data.success) {
         showToast('Account created! Redirecting…', 'success');
-        setTimeout(() => { window.location.href = 'login.html'; }, 1800);
+        setTimeout(() => { window.location.href="login.html"; }, 1800);
       } else if (res.status === 409) {
         setError('err-phone', 'Account already exists');
         showToast('User already exists — please sign in.', 'error');
