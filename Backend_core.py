@@ -225,7 +225,7 @@ def health():
 
 
 # -------------------- REGISTER ML ROUTES -------------------- #
-# register_ml_routes(app)
+register_ml_routes(app)
 
 # -------------------- RUN -------------------- #
 if __name__ == "__main__":
