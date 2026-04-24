@@ -77,7 +77,10 @@ def register():
 
         for field in required_fields:
             if field not in data or not data[field]:
-                return jsonify({"message": f"Missing field: {field}"}), 400
+                return jsonify({
+                    "success": False,
+                    "message": f"Missing field: {field}"
+                }), 400
 
         # Check existing user
         existing_user = (
@@ -89,7 +92,10 @@ def register():
         )
 
         if existing_user.data:
-            return jsonify({"message": "User already exists"}), 409
+            return jsonify({
+                "success": False,
+                "message": "User already exists"
+            }), 409
 
         # Hash password
         hashed_password = bcrypt.hashpw(
