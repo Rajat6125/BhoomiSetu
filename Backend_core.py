@@ -2,7 +2,7 @@ from flask import Flask, request, jsonify
 from supabase import create_client
 from flask_cors import CORS
 from dotenv import load_dotenv
-# from ml_service import register_ml_routes
+from ml_service import register_ml_routes
 import os
 import jwt
 import datetime
