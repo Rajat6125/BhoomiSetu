@@ -2,11 +2,17 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>BhoomiSetu – Sign In</title>
-<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+<title>BhoomiSetu – Farmer Access</title>
+<!-- Google Fonts & Font Awesome -->
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
 <style>
-  * { margin: 0; padding: 0; box-sizing: border-box; }
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
 
   body {
     font-family: 'DM Sans', sans-serif;
@@ -17,61 +23,58 @@
     min-height: 100vh;
   }
 
+  /* phone frame */
   .phone {
     width: 100%;
     max-width: 420px;
     height: 100vh;
-    max-height: 820px;
+    max-height: 780px;
     background: #fff;
-    overflow: hidden;
     position: relative;
+    overflow: hidden;
     box-shadow: 0 40px 100px rgba(0,0,0,0.5);
   }
 
   @media (min-width: 480px) {
     .phone { border-radius: 48px; }
   }
+
+  /* hero image section */
   .top-section {
-  position: absolute;
-  top: 0; left: 0; right: 0;
-  height: 50%;
-  overflow: hidden; /* IMPORTANT */
-}
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 40%;
+    overflow: hidden;
+  }
 
   .top-section img {
-  width: 100%;
-  height: 110%; /* slight zoom to avoid gap */
-  object-fit: cover;
-  object-position: center top; /* FIX: prevents upward shift */
-  display: block;
-}
+    width: 100%;
+    height: 110%;
+    object-fit: cover;
+    object-position: center 20%;
+    display: block;
+  }
 
   .top-section::before {
     content: '';
     position: absolute;
     inset: 0;
-    background: linear-gradient(
-      to bottom,
-      rgba(0,0,0,0.50) 0%,
-      rgba(0,0,0,0.15) 55%,
-      rgba(0,0,0,0.0) 100%
-    );
+    background: linear-gradient(to bottom, rgba(0,0,0,0.45), rgba(0,0,0,0.1), rgba(0,0,0,0.0));
     z-index: 1;
   }
 
   .logo {
-  position: absolute;
-  top: 22px;
-  left: 22px;
-  z-index: 3;
-}
+    position: absolute;
+    top: 24px;
+    left: 22px;
+    z-index: 3;
+  }
 
-.logo img {
-  height: 92px; /* adjust as needed */
-  width: auto;
-  object-fit: contain;
-  filter: drop-shadow(0 4px 12px rgba(0,0,0,0.4));
-}
+  .logo img {
+    height: 80px;
+    width: auto;
+    filter: drop-shadow(0 4px 12px rgba(0,0,0,0.35));
+  }
 
   .wave-divider {
     position: absolute;
@@ -81,42 +84,94 @@
     z-index: 2;
   }
 
+  /* bottom card with forms */
   .bottom-card {
     position: absolute;
-    bottom: 0; left: 0; right: 0;
-    height: 52%;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 64%;
     background: #fff;
-    padding: 30px 30px 26px;
+    border-radius: 28px 28px 0 0;
+    padding: 20px 24px 24px;
     display: flex;
     flex-direction: column;
+    box-shadow: 0 -8px 30px rgba(0,0,0,0.05);
+    z-index: 4;
+    overflow-y: auto;
   }
 
-  h2 {
+  /* tab switch */
+  .tab-bar {
+    display: flex;
+    gap: 20px;
+    margin-bottom: 20px;
+    border-bottom: 1.5px solid #efefef;
+  }
+
+  .tab-btn {
     font-family: 'Sora', sans-serif;
-    font-size: 27px;
+    font-size: 18px;
     font-weight: 700;
-    color: #111;
-    margin-top: 0.5px;
-    margin-bottom: 5px;
-    letter-spacing: -0.4px;
+    background: none;
+    border: none;
+    padding-bottom: 10px;
+    color: #aaa;
+    cursor: pointer;
+    transition: all 0.2s;
+    letter-spacing: -0.2px;
+  }
+
+  .tab-btn.active {
+    color: #e05a40;
+    border-bottom: 3px solid #e05a40;
+  }
+
+  .form-container {
+    flex: 1;
+    overflow-y: auto;
+    padding-right: 4px;
+  }
+
+  .auth-form {
+    display: none;
+    animation: fade 0.25s ease;
+  }
+
+  .auth-form.active-form {
+    display: block;
+  }
+
+  @keyframes fade {
+    from { opacity: 0; transform: translateY(6px);}
+    to { opacity: 1; transform: translateY(0);}
+  }
+
+  h3 {
+    font-family: 'Sora', sans-serif;
+    font-size: 26px;
+    font-weight: 700;
+    margin-bottom: 6px;
   }
 
   .accent-line {
-    width: 32px;
+    width: 38px;
     height: 3px;
     background: linear-gradient(90deg, #e05a40, #f0845a);
-    border-radius: 2px;
-    margin-bottom: 22px;
+    border-radius: 3px;
+    margin-bottom: 24px;
   }
 
-  .field { margin-bottom: 14px; }
+  .field {
+    margin-bottom: 16px;
+  }
 
   .field-label {
     font-size: 11px;
-    font-weight: 500;
-    color: #999;
-    letter-spacing: 0.08em;
+    font-weight: 600;
+    color: #8f8f8f;
     text-transform: uppercase;
+    letter-spacing: 0.5px;
     margin-bottom: 5px;
   }
 
@@ -129,328 +184,555 @@
     transition: border-color 0.2s;
   }
 
-  .input-wrap:focus-within { border-color: #e05a40; }
-  .input-wrap svg { flex-shrink: 0; color: #ccc; transition: color 0.2s; }
-  .input-wrap:focus-within svg { color: #e05a40; }
+  .input-wrap:focus-within {
+    border-bottom-color: #e05a40;
+  }
 
-  .input-wrap input {
+  .input-wrap i {
+    width: 20px;
+    color: #bbb;
+    font-size: 16px;
+    transition: color 0.2s;
+  }
+
+  .input-wrap:focus-within i {
+    color: #e05a40;
+  }
+
+  .input-wrap input, .input-wrap select {
     flex: 1;
     border: none;
     outline: none;
     font-family: 'DM Sans', sans-serif;
     font-size: 14px;
-    color: #222;
     background: transparent;
+    color: #1e1e1e;
   }
 
-  .input-wrap input::placeholder { color: #d0c8c8; }
-
-  .eye-btn {
-    background: none; border: none;
-    cursor: pointer; color: #ccc;
-    display: flex; padding: 0;
-    transition: color 0.2s;
+  .input-wrap input::placeholder {
+    color: #cfc9c9;
   }
-  .eye-btn:hover { color: #e05a40; }
+
+  .password-group {
+    position: relative;
+  }
+
+  .toggle-pwd {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #aaa;
+    font-size: 16px;
+    padding: 0 6px;
+  }
+
+  .toggle-pwd:hover {
+    color: #e05a40;
+  }
 
   .extras {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin: 14px 0 20px;
+    margin: 12px 0 24px;
   }
 
   .remember {
-    display: flex; align-items: center;
-    gap: 7px; font-size: 12.5px;
-    color: #777; cursor: pointer; user-select: none;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12.5px;
+    color: #666;
+    cursor: pointer;
   }
-  .remember input[type=checkbox] { accent-color: #e05a40; width: 14px; height: 14px; }
+
+  .remember input {
+    accent-color: #e05a40;
+    width: 15px;
+    height: 15px;
+  }
 
   .forgot {
-    font-size: 12.5px; color: #e05a40;
-    font-weight: 500; text-decoration: none;
-    transition: opacity 0.15s;
+    font-size: 12.5px;
+    color: #e05a40;
+    font-weight: 500;
+    text-decoration: none;
   }
-  .forgot:hover { opacity: 0.7; }
 
-  .login-btn {
+  .action-btn {
     width: 100%;
-    padding: 15px;
+    padding: 14px;
     border: none;
-    border-radius: 16px;
-    background: linear-gradient(135deg, #e05a40 0%, #f08060 100%);
-    color: #fff;
+    border-radius: 60px;
+    background: linear-gradient(135deg, #e05a40 0%, #f27b58 100%);
+    color: white;
     font-family: 'Sora', sans-serif;
-    font-size: 15px;
     font-weight: 700;
-    letter-spacing: 0.06em;
+    font-size: 15px;
+    letter-spacing: 0.5px;
     cursor: pointer;
-    box-shadow: 0 10px 28px rgba(224,90,64,0.40);
-    transition: transform 0.15s, box-shadow 0.15s;
-    margin-top: auto;
+    box-shadow: 0 8px 20px rgba(224,90,64,0.35);
+    transition: 0.15s;
+    margin-top: 6px;
   }
-  .login-btn:hover  { transform: translateY(-2px); box-shadow: 0 14px 32px rgba(224,90,64,0.50); }
-  .login-btn:active { transform: translateY(0); }
 
-  .signup-text {
-    text-align: center;
+  .action-btn:active {
+    transform: scale(0.97);
+  }
+
+  .action-btn:disabled {
+    opacity: 0.7;
+    transform: none;
+    cursor: not-allowed;
+  }
+
+  .message-area {
+    font-size: 12px;
     margin-top: 14px;
-    font-size: 13px;
-    color: #bbb;
+    text-align: center;
+    padding: 8px;
+    border-radius: 40px;
+    background: #f8f8f8;
+    color: #444;
   }
-  .signup-text a { color: #e05a40; font-weight: 600; text-decoration: none; }
+
+  .message-area.error {
+    background: #ffe6e5;
+    color: #c0392b;
+  }
+
+  .message-area.success {
+    background: #e3f7ec;
+    color: #2c6e3c;
+  }
+
+  .switch-text {
+    text-align: center;
+    margin-top: 18px;
+    font-size: 13px;
+    color: #aaa;
+  }
+
+  .switch-text a {
+    color: #e05a40;
+    font-weight: 600;
+    text-decoration: none;
+    cursor: pointer;
+  }
+
+  ::-webkit-scrollbar {
+    width: 3px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: #f1f1f1;
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: #e05a40;
+    border-radius: 6px;
+  }
 </style>
 </head>
 <body>
-
-<!DOCTYPE html>
-
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>BhoomiSetu – Sign Up</title>
-
-<link href="https://fonts.googleapis.com/css2?family=Sora:wght@400;600;700;800&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
-
-<style>
-* { margin: 0; padding: 0; box-sizing: border-box; }
-
-body {
-  font-family: 'DM Sans', sans-serif;
-  background: #1a1a1a;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 100vh;
-}
-
-.phone {
-  width: 100%;
-  max-width: 420px;
-  height: 100vh;
-  max-height: 820px;
-  background: #fff;
-  overflow: hidden;
-  position: relative;
-  box-shadow: 0 40px 100px rgba(0,0,0,0.5);
-}
-
-@media (min-width: 480px) {
-  .phone { border-radius: 48px; }
-}
-
-.top-section {
-  position: absolute;
-  top: 0; left: 0; right: 0;
-  height: 42%;
-  overflow: hidden;
-}
-
-.top-section img {
-  width: 100%;
-  height: 110%;
-  object-fit: cover;
-  object-position: center top;
-}
-
-.top-section::before {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(to bottom,
-    rgba(0,0,0,0.5),
-    rgba(0,0,0,0.1),
-    transparent);
-}
-
-.logo {
-  position: absolute;
-  top: 20px;
-  left: 20px;
-  z-index: 2;
-}
-
-.logo img {
-  height: 85px;
-}
-
-.wave-divider {
-  position: absolute;
-  bottom: -1px;
-  width: 100%;
-}
-
-.bottom-card {
-  position: absolute;
-  bottom: 0;
-  height: 60%;
-  width: 100%;
-  background: #fff;
-  padding: 24px 28px;
-  display: flex;
-  flex-direction: column;
-  overflow-y: auto;
-}
-
-h2 {
-  font-family: 'Sora', sans-serif;
-  font-size: 26px;
-  margin-bottom: 5px;
-}
-
-.accent-line {
-  width: 32px;
-  height: 3px;
-  background: linear-gradient(90deg, #e05a40, #f0845a);
-  margin-bottom: 18px;
-}
-
-.field { margin-bottom: 12px; }
-
-.field-label {
-  font-size: 11px;
-  color: #999;
-  text-transform: uppercase;
-  margin-bottom: 4px;
-}
-
-.input-wrap {
-  display: flex;
-  align-items: center;
-  border-bottom: 1.5px solid #eee;
-  padding: 6px 2px;
-}
-
-.input-wrap input {
-  border: none;
-  outline: none;
-  width: 100%;
-  font-size: 14px;
-  background: transparent;
-}
-
-.login-btn {
-  margin-top: 18px;
-  padding: 14px;
-  border: none;
-  border-radius: 14px;
-  background: linear-gradient(135deg, #e05a40, #f08060);
-  color: #fff;
-  font-weight: 700;
-  cursor: pointer;
-}
-
-.signup-text {
-  text-align: center;
-  margin-top: 12px;
-  font-size: 13px;
-  color: #aaa;
-}
-
-.signup-text a {
-  color: #e05a40;
-  text-decoration: none;
-  font-weight: 600;
-}
-</style>
-
-</head>
-
-<body>
-
 <div class="phone">
-
+  <!-- top image + wave -->
   <div class="top-section">
-    <img src="Pic/Back_1.jpg">
-
-```
-<div class="logo">
-  <img src="Icon/Logo.png">
-</div>
-
-<svg class="wave-divider" viewBox="0 0 420 60" preserveAspectRatio="none">
-  <path d="M0,60 L0,32 Q105,-4 210,30 Q315,64 420,22 L420,60 Z" fill="#fff"/>
-</svg>
-```
-
+    <!-- Replace with actual image path if needed -->
+    <img src="Pic/Back_1.jpg" alt="Farm landscape" onerror="this.src='https://placehold.co/600x800/5a3e2b/ffffff?text=Farm+View'">
+    <div class="logo">
+      <img src="Icon/Logo.png" alt="BhoomiSetu" onerror="this.style.display='none'">
+    </div>
+    <svg class="wave-divider" viewBox="0 0 420 50" preserveAspectRatio="none">
+      <path d="M0,50 L0,25 Q105,-5 210,22 Q315,50 420,18 L420,50 Z" fill="#ffffff"/>
+    </svg>
   </div>
 
   <div class="bottom-card">
+    <!-- Tabs -->
+    <div class="tab-bar">
+      <button class="tab-btn active" data-tab="signin">Sign In</button>
+      <button class="tab-btn" data-tab="signup">Create Account</button>
+    </div>
 
-```
-<h2>Create Account</h2>
-<div class="accent-line"></div>
+    <div class="form-container">
+      <!-- SIGN IN FORM -->
+      <div id="signin-form" class="auth-form active-form">
+        <h3>Welcome back</h3>
+        <div class="accent-line"></div>
 
-<div class="field">
-  <div class="field-label">Full Name</div>
-  <div class="input-wrap">
-    <input type="text" placeholder="Your name">
+        <div class="field">
+          <div class="field-label">Phone or Email</div>
+          <div class="input-wrap">
+            <i class="fas fa-envelope"></i>
+            <input type="text" id="login_identity" placeholder="your@email.com / 9876543210" autocomplete="username">
+          </div>
+        </div>
+
+        <div class="field">
+          <div class="field-label">Password</div>
+          <div class="input-wrap password-group">
+            <i class="fas fa-lock"></i>
+            <input type="password" id="login_password" placeholder="••••••••">
+            <button type="button" class="toggle-pwd" data-target="login_password"><i class="far fa-eye-slash"></i></button>
+          </div>
+        </div>
+
+        <div class="extras">
+          <label class="remember">
+            <input type="checkbox" id="rememberMe"> Remember me
+          </label>
+          <a href="#" class="forgot" id="forgotLink">Forgot Password?</a>
+        </div>
+
+        <button class="action-btn" id="loginBtn">Log in →</button>
+        <div id="loginMessage" class="message-area"></div>
+        <div class="switch-text">
+          New to BhoomiSetu? <a id="switchToSignup">Create an account</a>
+        </div>
+      </div>
+
+      <!-- SIGN UP FORM -->
+      <div id="signup-form" class="auth-form">
+        <h3>Join as Farmer</h3>
+        <div class="accent-line"></div>
+
+        <div class="field">
+          <div class="field-label">Full Name</div>
+          <div class="input-wrap">
+            <i class="fas fa-user"></i>
+            <input type="text" id="signup_name" placeholder="e.g. Surya Prakash">
+          </div>
+        </div>
+
+        <div class="field">
+          <div class="field-label">Phone or Email</div>
+          <div class="input-wrap">
+            <i class="fas fa-phone-alt"></i>
+            <input type="text" id="signup_phone_email" placeholder="Email or mobile number">
+          </div>
+        </div>
+
+        <div class="field">
+          <div class="field-label">Password</div>
+          <div class="input-wrap password-group">
+            <i class="fas fa-key"></i>
+            <input type="password" id="signup_password" placeholder="Create password (min 6 chars)">
+            <button type="button" class="toggle-pwd" data-target="signup_password"><i class="far fa-eye-slash"></i></button>
+          </div>
+        </div>
+
+        <div class="field">
+          <div class="field-label">Confirm Password</div>
+          <div class="input-wrap password-group">
+            <i class="fas fa-check-circle"></i>
+            <input type="password" id="signup_confirm_pwd" placeholder="Confirm password">
+            <button type="button" class="toggle-pwd" data-target="signup_confirm_pwd"><i class="far fa-eye-slash"></i></button>
+          </div>
+        </div>
+
+        <div class="field">
+          <div class="field-label">Location</div>
+          <div class="input-wrap">
+            <i class="fas fa-map-marker-alt"></i>
+            <input type="text" id="signup_location" placeholder="Village / District, State">
+          </div>
+        </div>
+
+        <div class="field">
+          <div class="field-label">Farm Size (acres)</div>
+          <div class="input-wrap">
+            <i class="fas fa-tractor"></i>
+            <input type="number" step="0.1" id="signup_farm_size" placeholder="e.g. 3.5">
+          </div>
+        </div>
+
+        <div class="field">
+          <div class="field-label">Primary Crop</div>
+          <div class="input-wrap">
+            <i class="fas fa-seedling"></i>
+            <input type="text" id="signup_primary_crop" placeholder="Wheat, Rice, Cotton, etc">
+          </div>
+        </div>
+
+        <button class="action-btn" id="signupBtn">Register →</button>
+        <div id="signupMessage" class="message-area"></div>
+        <div class="switch-text">
+          Already have an account? <a id="switchToSignin">Sign in</a>
+        </div>
+      </div>
+    </div>
   </div>
-</div>
-
-<div class="field">
-  <div class="field-label">Phone or Email</div>
-  <div class="input-wrap">
-    <input type="text" placeholder="Enter phone/email">
-  </div>
-</div>
-
-<div class="field">
-  <div class="field-label">Password</div>
-  <div class="input-wrap">
-    <input type="password" id="pwd1" placeholder="Create password">
-  </div>
-</div>
-
-<div class="field">
-  <div class="field-label">Confirm Password</div>
-  <div class="input-wrap">
-    <input type="password" id="pwd2" placeholder="Confirm password">
-  </div>
-</div>
-
-<div class="field">
-  <div class="field-label">Location</div>
-  <div class="input-wrap">
-    <input type="text" placeholder="Village / District">
-  </div>
-</div>
-
-<div class="field">
-  <div class="field-label">Farm Size (in acres)</div>
-  <div class="input-wrap">
-    <input type="number" step="0.1" placeholder="e.g. 2.5">
-  </div>
-</div>
-
-<div class="field">
-  <div class="field-label">Primary Crop</div>
-  <div class="input-wrap">
-    <input type="text" placeholder="e.g. Wheat, Rice">
-  </div>
-</div>
-
-<button class="login-btn">Sign Up</button>
-
-<div class="signup-text">
-  Already have an account? <a href="#">Sign in</a>
-</div>
-```
-
-  </div>
-
 </div>
 
 <script>
-  let visible = false;
-  function togglePwd() {
-    visible = !visible;
-    document.getElementById('pwdInput').type = visible ? 'text' : 'password';
-    document.getElementById('eyeIcon').style.opacity = visible ? '0.45' : '1';
+  // ======================= CONFIGURATION =========================
+  const API_BASE_URL ="https://bhoomisetu-api.onrender.com";   
+  
+  async function apiRequest(endpoint, method, bodyData) {
+    const url = `${API_BASE_URL}${endpoint}`;
+    const options = {
+      method: method,
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(bodyData)
+    };
+    try {
+      const response = await fetch(url, options);
+      let data;
+      try {
+        data = await response.json();
+      } catch(e) { data = { message: response.statusText }; }
+      return { status: response.status, data };
+    } catch (err) {
+      console.error("Network error:", err);
+      return { status: 0, data: { message: 
+      }
   }
-</script>
 
+  // ----- UI Helpers -----
+  function showMessage(containerId, msg, type) {
+    const el = document.getElementById(containerId);
+    if (!el) return;
+    el.innerText = msg;
+    el.className = `message-area ${type}`;
+    setTimeout(() => {
+      if (el.innerText === msg) el.className = "message-area";
+    }, 4000);
+  }
+
+  function setLoading(button, isLoading, originalText = null) {
+    if (!originalText && button.dataset.originalText === undefined) {
+      button.dataset.originalText = button.innerText;
+    }
+    const text = button.dataset.originalText || button.innerText;
+    if (isLoading) {
+      button.disabled = true;
+      button.innerText = "Processing...";
+    } else {
+      button.disabled = false;
+      button.innerText = originalText || text;
+    }
+  }
+
+  // Toggle forms via tabs
+  const signinFormDiv = document.getElementById('signin-form');
+  const signupFormDiv = document.getElementById('signup-form');
+  const tabBtns = document.querySelectorAll('.tab-btn');
+
+  function activateTab(tabId) {
+    if (tabId === 'signin') {
+      signinFormDiv.classList.add('active-form');
+      signupFormDiv.classList.remove('active-form');
+      tabBtns.forEach(btn => {
+        if (btn.dataset.tab === 'signin') btn.classList.add('active');
+        else btn.classList.remove('active');
+      });
+      // clear messages
+      document.getElementById('loginMessage').innerText = '';
+    } else {
+      signupFormDiv.classList.add('active-form');
+      signinFormDiv.classList.remove('active-form');
+      tabBtns.forEach(btn => {
+        if (btn.dataset.tab === 'signup') btn.classList.add('active');
+        else btn.classList.remove('active');
+      });
+      document.getElementById('signupMessage').innerText = '';
+    }
+  }
+
+  tabBtns.forEach(btn => {
+    btn.addEventListener('click', () => {
+      activateTab(btn.dataset.tab);
+    });
+  });
+
+  // Switch links
+  document.getElementById('switchToSignup')?.addEventListener('click', (e) => {
+    e.preventDefault();
+    activateTab('signup');
+  });
+  document.getElementById('switchToSignin')?.addEventListener('click', (e) => {
+    e.preventDefault();
+    activateTab('signin');
+  });
+  document.getElementById('forgotLink')?.addEventListener('click', (e) => {
+    e.preventDefault();
+    showMessage('loginMessage', '📞 Contact support: support@bhoomisetu.com', 'error');
+  });
+
+  // ========== PASSWORD TOGGLE ==========
+  document.querySelectorAll('.toggle-pwd').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const targetId = btn.getAttribute('data-target');
+      const inputField = document.getElementById(targetId);
+      if (inputField) {
+        const type = inputField.getAttribute('type') === 'password' ? 'text' : 'password';
+        inputField.setAttribute('type', type);
+        const icon = btn.querySelector('i');
+        if (icon) {
+          icon.classList.toggle('fa-eye-slash');
+          icon.classList.toggle('fa-eye');
+        }
+      }
+    });
+  });
+
+  // Load stored email if "remember me" previously saved
+  function loadRememberedLogin() {
+    const savedIdentity = localStorage.getItem('bhoomisetu_identity');
+    const rememberChecked = localStorage.getItem('bhoomisetu_remember') === 'true';
+    if (savedIdentity && rememberChecked) {
+      document.getElementById('login_identity').value = savedIdentity;
+      document.getElementById('rememberMe').checked = true;
+    }
+  }
+  loadRememberedLogin();
+
+  // ---------- SIGNUP LOGIC ----------
+  const signupBtn = document.getElementById('signupBtn');
+  signupBtn.addEventListener('click', async () => {
+    // get values
+    const name = document.getElementById('signup_name').value.trim();
+    const phone_email = document.getElementById('signup_phone_email').value.trim();
+    const password = document.getElementById('signup_password').value;
+    const confirmPwd = document.getElementById('signup_confirm_pwd').value;
+    const location = document.getElementById('signup_location').value.trim();
+    const farm_size = document.getElementById('signup_farm_size').value;
+    const primary_crop = document.getElementById('signup_primary_crop').value.trim();
+
+    // validation
+    if (!name || !phone_email || !password || !confirmPwd || !location || !farm_size || !primary_crop) {
+      showMessage('signupMessage', '❌ All fields are required', 'error');
+      return;
+    }
+    if (password.length < 6) {
+      showMessage('signupMessage', '⚠️ Password must be at least 6 characters', 'error');
+      return;
+    }
+    if (password !== confirmPwd) {
+      showMessage('signupMessage', '🔁 Passwords do not match', 'error');
+      return;
+    }
+    const farmSizeNum = parseFloat(farm_size);
+    if (isNaN(farmSizeNum) || farmSizeNum <= 0) {
+      showMessage('signupMessage', '🌾 Farm size must be a positive number (acres)', 'error');
+      return;
+    }
+
+    setLoading(signupBtn, true);
+    const payload = {
+      name: name,
+      phone_email: phone_email,
+      password: password,
+      location: location,
+      farm_size: farmSizeNum,
+      primary_crop: primary_crop
+    };
+
+    const { status, data } = await apiRequest('/register', 'POST', payload);
+    setLoading(signupBtn, false);
+
+    if (status === 201 || (data && data.success === true)) {
+      showMessage('signupMessage', '✅ Registration successful! Please sign in.', 'success');
+      // auto fill login identity & clear signup form
+      document.getElementById('login_identity').value = phone_email;
+      // reset fields optionally
+      document.getElementById('signup_name').value = '';
+      document.getElementById('signup_phone_email').value = '';
+      document.getElementById('signup_password').value = '';
+      document.getElementById('signup_confirm_pwd').value = '';
+      document.getElementById('signup_location').value = '';
+      document.getElementById('signup_farm_size').value = '';
+      document.getElementById('signup_primary_crop').value = '';
+      // switch to login tab
+      activateTab('signin');
+    } else if (status === 409) {
+      showMessage('signupMessage', '⚠️ User already exists. Please sign in.', 'error');
+    } else {
+      const errMsg = data?.message || data?.error || 'Registration failed. Try again.';
+      showMessage('signupMessage', `❌ ${errMsg}`, 'error');
+    }
+  });
+
+  // ---------- LOGIN LOGIC ----------
+  const loginBtn = document.getElementById('loginBtn');
+  loginBtn.addEventListener('click', async () => {
+    const identity = document.getElementById('login_identity').value.trim();
+    const password = document.getElementById('login_password').value;
+    const rememberCheck = document.getElementById('rememberMe').checked;
+
+    if (!identity || !password) {
+      showMessage('loginMessage', '⚠️ Please enter phone/email and password', 'error');
+      return;
+    }
+
+    setLoading(loginBtn, true);
+    const payload = { phone_email: identity, password: password };
+    const { status, data } = await apiRequest('/login', 'POST', payload);
+    setLoading(loginBtn, false);
+
+    if (status === 200 && data?.token) {
+      // success: store token & remember identity
+      localStorage.setItem('bhoomisetu_token', data.token);
+      if (rememberCheck) {
+        localStorage.setItem('bhoomisetu_identity', identity);
+        localStorage.setItem('bhoomisetu_remember', 'true');
+      } else {
+        localStorage.removeItem('bhoomisetu_identity');
+        localStorage.setItem('bhoomisetu_remember', 'false');
+      }
+      showMessage('loginMessage', `🎉 Welcome back! Redirecting to dashboard...`, 'success');
+      // small delay: simulate redirect or show farmer greeting
+      setTimeout(() => {
+        // For demo we show success + you can integrate dashboard later
+        alert(`✅ Login successful!\nToken stored. You're now signed in as ${identity}`);
+        // Optional: hide forms / show protected content (dummy)
+        // You can replace with actual dashboard redirect
+        console.log("JWT:", data.token);
+      }, 800);
+    } 
+    else if (status === 404 && data?.redirect === 'signup') {
+      showMessage('loginMessage', '📝 Account not found. Please create an account.', 'error');
+      setTimeout(() => activateTab('signup'), 1200);
+    } 
+    else if (status === 401) {
+      showMessage('loginMessage', '🔒 Incorrect password. Try again.', 'error');
+    }
+    else {
+      const msg = data?.message || data?.error || 'Login failed. Check server connection.';
+      showMessage('loginMessage', `❌ ${msg}`, 'error');
+    }
+  });
+
+  // On page load: check if API base URL hint for user
+  if (API_BASE_URL === "http://localhost:10000") {
+    console.warn("⚠️ API_BASE_URL is set to localhost:10000. Update to your actual backend URL.");
+    // Show subtle hint only once on dev mode
+    const hintDiv = document.createElement('div');
+    hintDiv.style.position = 'fixed'; hintDiv.style.bottom = '10px'; hintDiv.style.left = '10px';
+    hintDiv.style.background = '#ffecb3'; hintDiv.style.fontSize = '11px'; hintDiv.style.padding = '4px 12px';
+    hintDiv.style.borderRadius = '20px'; hintDiv.style.zIndex = '999';
+    hintDiv.innerHTML = '🔧 API: localhost:10000 (update in script)';
+    if (!window.location.hostname.includes('render')) document.body.appendChild(hintDiv);
+    setTimeout(() => hintDiv?.remove(), 5000);
+  }
+
+  // Add quick enter key submission
+  const handleEnter = (e, type) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      if (type === 'login') loginBtn.click();
+      else if (type === 'signup') signupBtn.click();
+    }
+  };
+  document.getElementById('login_password')?.addEventListener('keypress', (e) => handleEnter(e, 'login'));
+  document.getElementById('login_identity')?.addEventListener('keypress', (e) => handleEnter(e, 'login'));
+  const signupInputs = ['signup_name','signup_phone_email','signup_password','signup_confirm_pwd','signup_location','signup_farm_size','signup_primary_crop'];
+  signupInputs.forEach(id => {
+    document.getElementById(id)?.addEventListener('keypress', (e) => handleEnter(e, 'signup'));
+  });
+</script>
 </body>
 </html>
