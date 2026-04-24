@@ -490,6 +490,24 @@
   }
 
   document.addEventListener('keydown', e => { if (e.key === 'Enter') handleSignup(); });
+  (function prefillRegister() {
+  // get value saved from landing page
+  const fromLanding = localStorage.getItem('phone_email');
+
+  // optional fallback (if user came from login page)
+  const existingUser =
+    localStorage.getItem('bhoomisetu_user') ||
+    sessionStorage.getItem('bhoomisetu_user');
+
+  const value = fromLanding || existingUser;
+
+  if (value) {
+    document.getElementById('phoneEmail').value = value;
+
+    // optional: clear after using (recommended)
+    localStorage.removeItem('phone_email');
+  }
+})();
 </script>
 </body>
 </html>
