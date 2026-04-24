@@ -85,9 +85,10 @@
   .wave-wrap {
     position: absolute;
     left: 0; right: 0;
+    /* bottom of hero = 36% of phone height; card top = 34%; wave bridges the gap */
     bottom: calc(64% - 2px);
     z-index: 2;
-    line-height: 0;
+    line-height: 0;   /* remove any inline gap under SVG */
   }
   .wave-wrap svg {
     display: block;
@@ -108,6 +109,7 @@
     flex-direction: column;
   }
 
+  /* dot-grid texture */
   .card::before {
     content: '';
     position: absolute; inset: 0;
@@ -138,26 +140,25 @@
     grid-template-columns: 1fr 1fr;
     gap: 9px 14px;
     flex: 1;
-    overflow-y: auto;
-    padding-right: 4px;
   }
   .field { display: flex; flex-direction: column; gap: 2px; }
   .field.full { grid-column: 1 / -1; }
 
   .field-label {
     font-size: 9.5px; font-weight: 700;
-    color: #7a7270;
+    color: #7a7270;           /* was #b8b0b0 — too light */
     letter-spacing: 0.1em;
     text-transform: uppercase;
   }
 
   .input-wrap {
     display: flex; align-items: center; gap: 6px;
-    border-bottom: 1.5px solid #ddd;
+    border-bottom: 1.5px solid #ddd;  /* was #ebebeb — slightly more visible */
     padding: 5px 1px;
     transition: border-color 0.2s;
   }
   .input-wrap:focus-within { border-bottom-color: var(--brand); }
+
 
   .input-wrap svg { flex-shrink: 0; color: #8b8282; transition: color 0.2s; }
   .input-wrap:focus-within svg { color: var(--brand); }
@@ -289,6 +290,7 @@
 
   <div class="wave-wrap">
     <svg viewBox="0 0 390 52" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+      <!-- white fill that flows down into the card -->
       <path d="M0,52 L0,30 Q65,4 130,20 Q195,36 260,16 Q325,-4 390,24 L390,52 Z" fill="#ffffff"/>
     </svg>
   </div>
@@ -296,7 +298,9 @@
   <div class="card">
 
     <div class="card-header">
-      <h2>Create Account</h2>
+      <h2>Create Account
+        
+      </h2>
     </div>
 
     <div class="fields-grid">
@@ -374,7 +378,7 @@
     <div class="divider"></div>
 
     <div class="cta-row">
-      <button class="signup-btn" id="signupBtn">Sign Up</button>
+      <button class="signup-btn" id="signupBtn" onclick="handleSignup()">Sign Up</button>
       <div class="signin-link">
         Have account?
         <a href="login.html">Sign in →</a>
@@ -388,30 +392,6 @@
 
 <script>
   const API_BASE = "https://bhoomisetu-t4nw.onrender.com"; 
-
-  // Debug: Check if API is reachable
-  async function testAPIConnection() {
-    try {
-      console.log("Testing API connection...");
-      const response = await fetch(`${API_BASE}/health`);
-      if (response.ok) {
-        console.log("✅ API is reachable");
-        return true;
-      } else {
-        console.log("❌ API returned error:", response.status);
-        return false;
-      }
-    } catch (error) {
-      console.error("❌ Cannot reach API:", error);
-      showToast("Cannot connect to server. Please check your connection.", "error");
-      return false;
-    }
-  }
-
-  // Test connection on page load
-  window.addEventListener('load', () => {
-    testAPIConnection();
-  });
 
   document.getElementById('bgImg').onerror = function() {
     this.src = 'https://images.pexels.com/photos/1595108/pexels-photo-1595108.jpeg?auto=compress&cs=tinysrgb&w=600';
@@ -439,7 +419,6 @@
     el.textContent = msg;
     el.classList.toggle('show', !!msg);
   }
-  
   function clearAllErrors() {
     ['err-name','err-phone','err-pwd','err-pwd2','err-location','err-farm','err-crop']
       .forEach(id => setError(id, ''));
@@ -464,8 +443,6 @@
   }
 
   async function handleSignup() {
-    console.log("Signup function called");
-    
     clearAllErrors();
 
     const payload = {
@@ -478,29 +455,18 @@
       primary_crop:    document.getElementById('primaryCrop').value.trim(),
     };
 
-    console.log("Payload:", { ...payload, password: "***" });
-
-    if (!validate(payload)) {
-      console.log("Validation failed");
-      return;
-    }
-    
+    if (!validate(payload)) return;
     setLoading(true);
 
     const { confirmPassword, ...body } = payload;
 
     try {
-      console.log("Sending request to:", `${API_BASE}/register`);
-      
       const res  = await fetch(`${API_BASE}/register`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(body)
       });
-      
-      console.log("Response status:", res.status);
       const data = await res.json();
-      console.log("Response data:", data);
 
       if (res.status === 201 && data.success) {
         showToast('Account created! Redirecting…', 'success');
@@ -514,38 +480,32 @@
         showToast(data.message || data.error || 'Registration failed.', 'error');
       }
     } catch (err) {
-      console.error("Fetch error:", err);
-      showToast('Network error — cannot connect to server. Please check if the server is running.', 'error');
+      console.error(err);
+      showToast('Network error — is the server running?', 'error');
     } finally {
       setLoading(false);
     }
   }
 
-  // Attach event listener properly
-  document.addEventListener('DOMContentLoaded', () => {
-    const signupBtn = document.getElementById('signupBtn');
-    if (signupBtn) {
-      signupBtn.addEventListener('click', handleSignup);
-      console.log("Event listener attached to signup button");
-    } else {
-      console.error("Signup button not found!");
-    }
-  });
-
-  document.addEventListener('keydown', e => { 
-    if (e.key === 'Enter') handleSignup(); 
-  });
-  
+  document.addEventListener('keydown', e => { if (e.key === 'Enter') handleSignup(); });
   (function prefillRegister() {
-    const fromLanding = localStorage.getItem('phone_email');
-    const existingUser = localStorage.getItem('bhoomisetu_user') || sessionStorage.getItem('bhoomisetu_user');
-    const value = fromLanding || existingUser;
+  // get value saved from landing page
+  const fromLanding = localStorage.getItem('phone_email');
 
-    if (value) {
-      document.getElementById('phoneEmail').value = value;
-      localStorage.removeItem('phone_email');
-    }
-  })();
+  // optional fallback (if user came from login page)
+  const existingUser =
+    localStorage.getItem('bhoomisetu_user') ||
+    sessionStorage.getItem('bhoomisetu_user');
+
+  const value = fromLanding || existingUser;
+
+  if (value) {
+    document.getElementById('phoneEmail').value = value;
+
+    // optional: clear after using (recommended)
+    localStorage.removeItem('phone_email');
+  }
+})();
 </script>
 </body>
 </html>
