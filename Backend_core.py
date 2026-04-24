@@ -224,9 +224,11 @@ def health():
     })
 
 
+# -------------------- REGISTER ML ROUTES -------------------- #
+register_ml_routes(app)
+
 # -------------------- RUN -------------------- #
 if __name__ == "__main__":
     import os
     port = int(os.environ.get("PORT", 10000))
     app.run(host="0.0.0.0", port=port)
-    register_ml_routes(app)
