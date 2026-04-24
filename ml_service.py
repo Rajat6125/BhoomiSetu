@@ -20,16 +20,18 @@ class CropService:
         self.model = None
         self.id_map = None
 
-        # normalized lowercase columns
-        self.features = [
-            'n',
-            'p',
-            'k',
-            'temperature',
-            'humidity',
-            'ph',
-            'rainfall'
-        ]
+        # Map of expected feature names to actual column names in Supabase
+        self.feature_mapping = {
+            'n': 'N',           # Note: uppercase N in your table
+            'p': 'P',           # uppercase P
+            'k': 'K',           # uppercase K
+            'temperature': 'temperature',
+            'humidity': 'humidity',
+            'ph': 'ph',
+            'rainfall': 'rainfall'
+        }
+        
+        self.features = list(self.feature_mapping.keys())
 
     def load_data(self):
         res = supabase.table("crop_recommendation").select("*").execute()
@@ -38,22 +40,15 @@ class CropService:
         if df.empty:
             raise ValueError("crop_recommendation table is empty")
 
-        # normalize column names
-        df.columns = (
-            df.columns
-              .str.strip()
-              .str.lower()
-              .str.replace(' ', '_', regex=False)
-              .str.replace('%', '', regex=False)
-        )
-
-        print("Crop columns:", df.columns.tolist())
-
+        print("Original crop columns:", df.columns.tolist())
+        
+        # No need to rename columns, just work with original names
+        # The label column is fine as 'label'
+        
         if 'label' not in df.columns:
             raise ValueError("Column 'label' not found in crop_recommendation table")
 
         crops = sorted(df['label'].unique())
-
         self.id_map = {i: c for i, c in enumerate(crops)}
         reverse = {c: i for i, c in self.id_map.items()}
 
@@ -64,7 +59,8 @@ class CropService:
     def train(self):
         df = self.load_data()
 
-        X = df[self.features]
+        # Use actual column names from Supabase
+        X = df[['N', 'P', 'K', 'temperature', 'humidity', 'ph', 'rainfall']]
         y = df['label_id']
 
         X_train, X_test, y_train, y_test = train_test_split(
@@ -74,16 +70,19 @@ class CropService:
         self.model = XGBClassifier(
             n_estimators=100,
             learning_rate=0.1,
-            eval_metric="mlogloss"
+            eval_metric="mlogloss",
+            random_state=42
         )
 
         self.model.fit(X_train, y_train)
+        print(f"✅ Crop model trained. Test accuracy: {self.model.score(X_test, y_test):.2f}")
 
     def predict(self, data):
+        # Map incoming data (which uses lowercase keys) to uppercase column names
         x = np.array([[
-            float(data['N']),
-            float(data['P']),
-            float(data['K']),
+            float(data['N']),           # Note: expecting uppercase N in request
+            float(data['P']),           # uppercase P
+            float(data['K']),           # uppercase K
             float(data['temperature']),
             float(data['humidity']),
             float(data['ph']),
@@ -113,53 +112,53 @@ class YieldService:
         if df.empty:
             raise ValueError("crop_yield table is empty")
 
-        # normalize all columns
-        df.columns = (
-            df.columns
-              .str.strip()
-              .str.lower()
-              .str.replace(' ', '_', regex=False)
-              .str.replace('%', '', regex=False)
-        )
-
-        print("Yield columns:", df.columns.tolist())
+        print("Original yield columns:", df.columns.tolist())
+        
+        # Check for column names with spaces - they need special handling
+        # In your table, 'Dist Code' has a space, 'State Name' has space, etc.
+        
+        # Rename columns with spaces to avoid issues
+        df.columns = df.columns.str.replace(' ', '_', regex=False)
+        
+        print("Renamed yield columns:", df.columns.tolist())
 
         return df
 
     def train(self):
         df = self.load_data()
 
+        # Create mappings for state and crop
         self.state_map = {
-            s: i for i, s in enumerate(df['state_name'].unique())
+            s: i for i, s in enumerate(df['State_Name'].unique())
         }
 
         self.crop_map = {
-            c: i for i, c in enumerate(df['crop'].unique())
+            c: i for i, c in enumerate(df['Crop'].unique())
         }
 
-        df['state_code'] = df['state_name'].map(self.state_map)
-        df['crop_code'] = df['crop'].map(self.crop_map)
+        df['state_code'] = df['State_Name'].map(self.state_map)
+        df['crop_code'] = df['Crop'].map(self.crop_map)
 
-        # Using your actual SQL column equivalents
+        # Use actual column names from your table
         X = df[
             [
                 'state_code',
                 'crop_code',
-                'area_ha',
-                'total_n_kg',
-                'total_p_kg',
-                'total_k_kg',
-                'temperature_c',
-                'humidity_',
-                'ph',
-                'rainfall_mm'
+                'Area_ha',
+                'Total_N_kg',
+                'Total_P_kg',
+                'Total_K_kg',
+                'Temperature_C',
+                'Humidity_%',
+                'pH',
+                'Rainfall_mm'
             ]
         ]
 
-        y = df['yield_kg_per_ha']
+        y = df['Yield_kg_per_ha']
 
         X_train, X_test, y_train, y_test = train_test_split(
-            X, y, random_state=42
+            X, y, test_size=0.2, random_state=42
         )
 
         self.model = RandomForestRegressor(
@@ -168,16 +167,17 @@ class YieldService:
         )
 
         self.model.fit(X_train, y_train)
+        print(f"✅ Yield model trained. R² score: {self.model.score(X_test, y_test):.2f}")
 
     def predict(self, data):
-
+        # Map incoming data to column names used in training
         x = [[
             self.state_map[data['state_name']],
             self.crop_map[data['crop']],
             float(data['area_ha']),
-            float(data.get('N_req', 0)),
-            float(data.get('P_req', 0)),
-            float(data.get('K_req', 0)),
+            float(data.get('total_n_kg', 0)),
+            float(data.get('total_p_kg', 0)),
+            float(data.get('total_k_kg', 0)),
             float(data['temperature']),
             float(data['humidity']),
             float(data['ph']),
@@ -185,7 +185,6 @@ class YieldService:
         ]]
 
         pred = self.model.predict(x)[0]
-
         return max(0, float(pred))
 
 
@@ -200,19 +199,16 @@ def register_ml_routes(app):
     yield_service.train()
     print("✅ ML models ready")
 
-
     @app.route('/predict', methods=['POST'])
     def predict_crop():
         data = request.get_json()
         result = crop_service.predict(data)
         return jsonify(result)
 
-
     @app.route('/predict_yield', methods=['POST'])
     def predict_yield():
         data = request.get_json()
         result = yield_service.predict(data)
-
         return jsonify({
             "yield_kg_per_ha": round(result, 2)
         })
