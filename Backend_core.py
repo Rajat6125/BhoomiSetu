@@ -81,7 +81,7 @@ def register():
                     "success": False,
                     "message": f"Missing field: {field}"
                 }), 400
-
+                
         # Check existing user
         existing_user = (
             supabase

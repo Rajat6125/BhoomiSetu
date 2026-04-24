@@ -443,69 +443,75 @@
   }
 
   async function handleSignup() {
-    clearAllErrors();
+  console.log("Signup clicked"); // DEBUG
 
-    const payload = {
-      name:            document.getElementById('fullName').value.trim(),
-      phone_email:     document.getElementById('phoneEmail').value.trim(),
-      password:        document.getElementById('pwd1').value,
-      confirmPassword: document.getElementById('pwd2').value,
-      location:        document.getElementById('location').value.trim(),
-      farm_size:       document.getElementById('farmSize').value,
-      primary_crop:    document.getElementById('primaryCrop').value.trim(),
-    };
+  clearAllErrors();
 
-    if (!validate(payload)) return;
-    setLoading(true);
+  const payload = {
+  name: document.getElementById('fullName').value.trim(),
+  phone_email: document.getElementById('phoneEmail').value.trim(),
+  password: document.getElementById('pwd1').value,
+  confirmPassword: document.getElementById('pwd2').value,
+  location: document.getElementById('location').value.trim(),
+  farm_size: document.getElementById('farmSize').value,
+  primary_crop: document.getElementById('primaryCrop').value.trim(),
+  };
 
-    const { confirmPassword, ...body } = payload;
+  if (!validate(payload)) return;
 
-    try {
-      const res  = await fetch(`${API_BASE}/register`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(body)
-      });
-      const data = await res.json();
+  setLoading(true);
 
-      if (res.status === 201 && data.success) {
-        showToast('Account created! Redirecting…', 'success');
-        setTimeout(() => { window.location.href="login.html"; }, 1800);
-      } else if (res.status === 409) {
-        setError('err-phone', 'Account already exists');
-        showToast('User already exists — please sign in.', 'error');
-      } else if (res.status === 400) {
-        showToast(data.message || 'Fill all fields correctly.', 'error');
-      } else {
-        showToast(data.message || data.error || 'Registration failed.', 'error');
-      }
-    } catch (err) {
-      console.error(err);
-      showToast('Network error — is the server running?', 'error');
-    } finally {
-      setLoading(false);
-    }
+  const { confirmPassword, ...body } = payload;
+
+  try {
+  const res = await fetch(`${API_BASE}/register`, {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify(body)
+  });
+
+  ```
+  // 🔥 IMPORTANT FIX
+  const text = await res.text();
+  console.log("RAW RESPONSE:", text);
+
+  let data;
+  try {
+    data = JSON.parse(text);
+  } catch (e) {
+    console.error("JSON parse failed:", e);
+    showToast("Server error (invalid response)", "error");
+    return;
   }
 
-  document.addEventListener('keydown', e => { if (e.key === 'Enter') handleSignup(); });
-  (function prefillRegister() {
-  // get value saved from landing page
-  const fromLanding = localStorage.getItem('phone_email');
+  console.log("PARSED:", data);
 
-  // optional fallback (if user came from login page)
-  const existingUser =
-    localStorage.getItem('bhoomisetu_user') ||
-    sessionStorage.getItem('bhoomisetu_user');
+  if (res.status === 201 && data.success) {
+    showToast('Account created! Redirecting…', 'success');
+    setTimeout(() => {
+      window.location.href = "login.html";
+    }, 1800);
 
-  const value = fromLanding || existingUser;
+  } else if (res.status === 409) {
+    setError('err-phone', 'Account already exists');
+    showToast(data.message || 'User already exists', 'error');
 
-  if (value) {
-    document.getElementById('phoneEmail').value = value;
+  } else if (res.status === 400) {
+    showToast(data.message || 'Fill all fields correctly.', 'error');
 
-    // optional: clear after using (recommended)
-    localStorage.removeItem('phone_email');
+  } else {
+    showToast(data.message || data.error || 'Registration failed.', 'error');
   }
-})();
-</script>
+  ```
+
+  } catch (err) {
+  console.error("FETCH ERROR:", err);
+  showToast('Network error — check backend', 'error');
+  } finally {
+  setLoading(false);
+  }
+  }
+
+  </script>
 </body>
 </html>
