@@ -455,11 +455,22 @@
       if (e.key === 'Enter') handleLogin();
     });
   });
-
+  
   (function prefill() {
-    const stored = localStorage.getItem('bhoomisetu_user') || sessionStorage.getItem('bhoomisetu_user');
-    if (stored) document.getElementById('emailInput').value = stored;
-  })();
+  // first check value from landing page
+  const fromLanding = localStorage.getItem('phone_email');
+
+  // fallback to logged-in stored user
+  const existingUser =
+    localStorage.getItem('bhoomisetu_user') ||
+    sessionStorage.getItem('bhoomisetu_user');
+
+  const value = fromLanding || existingUser;
+
+  if (value) {
+    document.getElementById('emailInput').value = value;
+  }
+})();
 </script>
 </body>
 </html>
