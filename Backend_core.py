@@ -2,6 +2,7 @@ from flask import Flask, request, jsonify
 from supabase import create_client
 from flask_cors import CORS
 from dotenv import load_dotenv
+from ml_service import register_ml_routes
 import os
 import jwt
 import datetime
@@ -229,3 +230,4 @@ if __name__ == "__main__":
     import os
     port = int(os.environ.get("PORT", 10000))
     app.run(host="0.0.0.0", port=port)
+    register_ml_routes(app)
