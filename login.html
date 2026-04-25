@@ -360,7 +360,7 @@
   (function checkExistingSession() {
     const token = localStorage.getItem('bhoomisetu_token') || sessionStorage.getItem('bhoomisetu_token');
     if (token && token.split('.').length === 3) {
-     window.location.href = 'main.html';
+     window.location.href = 'Bot_main.html';
     }
   })();
 
@@ -425,7 +425,7 @@
         sessionStorage.setItem('just_logged_in', 'true');
 
         showToast('Login successful! Redirecting…', 'success');
-        setTimeout(() => { window.location.href = 'main.html'; }, 1200);
+        setTimeout(() => { window.location.href = 'Bot_main.html'; }, 1200);
 
       } else if (res.status === 401) {
         setError('err-pwd', 'Wrong password');

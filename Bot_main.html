@@ -1,0 +1,663 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BhoomiSetu AI - Chatbot</title>
+<style>
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+  }
+
+  body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #f5f7fa 0%, #ffffff 100%);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+    padding: 10px;
+  }
+
+  .chatbot-container {
+    width: 100%;
+    max-width: 420px;
+    height: 100vh;
+    max-height: 760px;
+    background: #ffffff;
+    border-radius: 24px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.12);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  /* ────────── Header ────────── */
+  .header {
+    background: rgba(255, 166, 0, 0.797);
+    padding: 16px 18px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-shrink: 0;
+    border-bottom: 1px solid #e8eef0;
+  }
+
+  .header-left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .logo-circle {
+    width: 44px;
+    height: 44px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 4px 12px rgba(255, 157, 66, 0.3);
+    overflow: hidden;
+    background: orange;
+  }
+
+  .logo-circle img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+
+  .header-text h1 {
+    font-size: 16px;
+    font-weight: 700;
+    color: #1b5e3f;
+    margin: 0;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .verified-badge {
+    width: 16px;
+    height: 16px;
+    background: #4caf50;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #ffffff;
+    font-size: 10px;
+    font-weight: bold;
+  }
+
+  .header-text p {
+    font-size: 11px;
+    color: #7a8a7f;
+    margin: 0;
+  }
+
+  .header-menu {
+    background: transparent;
+    border: none;
+    color: #1b5e3f;
+    width: 32px;
+    height: 32px;
+    border-radius: 8px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s;
+    font-size: 18px;
+  }
+
+  .header-menu:hover {
+    background: rgba(45, 124, 76, 0.1);
+  }
+
+  /* ────────── Chat Content ────────── */
+  .chat-content {
+    flex: 1;
+    overflow-y: auto;
+    padding: 24px 18px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    background: linear-gradient(180deg, #fafbfc 0%, #f0f8f5 100%);
+  }
+
+  .messages-list {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 20px;
+  }
+
+  .message {
+    animation: messageIn 0.3s ease-out;
+    display: flex;
+    margin: 8px 0;
+  }
+
+  .message.user {
+    justify-content: flex-end;
+  }
+
+  .message.bot {
+    justify-content: flex-start;
+  }
+
+  @keyframes messageIn {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  .message-bubble {
+    max-width: 75%;
+    padding: 10px 14px;
+    border-radius: 16px;
+    font-size: 14px;
+    line-height: 1.4;
+    word-wrap: break-word;
+  }
+
+  .message.user .message-bubble {
+    background: linear-gradient(135deg, #ff9d42 0%, #ff7a3d 100%);
+    color: #ffffff;
+    border-bottom-right-radius: 4px;
+  }
+
+  .message.bot .message-bubble {
+    background: #f0f0f0;
+    color: #333;
+    border-bottom-left-radius: 4px;
+  }
+
+  .empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 40px 20px;
+  }
+
+  .animated-logo {
+    width: 180px;
+    height: 180px;
+    margin-bottom: 20px;
+    animation: float 3s ease-in-out infinite;
+  }
+
+  @keyframes float {
+    0%, 100% { transform: translateY(0px); }
+    50% { transform: translateY(-8px); }
+  }
+
+  .logo-svg {
+    width: 100%;
+    height: 100%;
+  }
+
+  .bot-gif {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+
+  .bot-message-avatar {
+    width: 120px;
+    height: 120px;
+    margin: 20px 0;
+    opacity: 0.8;
+  }
+
+  .greeting-text {
+    font-size: 28px;
+    font-weight: 700;
+    color: #1b5e3f;
+    margin-bottom: 8px;
+    animation: slideIn 0.6s ease-out;
+  }
+
+  .greeting-subtext {
+    font-size: 14px;
+    color: #ff9d42;
+    margin-bottom: 30px;
+    animation: slideIn 0.6s ease-out 0.1s both;
+  }
+
+  @keyframes slideIn {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+
+  /* ────────── Input Area ────────── */
+  .input-area {
+    background: #ffffff;
+    padding: 12px 16px 16px 16px;
+    border-top: 1px solid #e8eef0;
+    display: flex;
+    gap: 12px;
+    align-items: flex-end;
+    flex-shrink: 0;
+  }
+
+  .input-box {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    background: transparent;
+    border: none;
+    border-bottom: 2px solid #e0e8ed;
+    border-radius: 0;
+    padding: 8px 0;
+    transition: all 0.2s;
+  }
+
+  .input-box:focus-within {
+    border-bottom-color: #ff9d42;
+  }
+
+  .input-box input {
+    flex: 1;
+    border: none;
+    outline: none;
+    background: transparent;
+    font-size: 14px;
+    color: #333;
+    font-family: inherit;
+    width: 100%;
+  }
+
+  .input-box input::placeholder {
+    color: #999;
+  }
+
+  .send-btn {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: transparent;
+    border: 2px solid #ff9d42;
+    color: #ff9d42;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    transition: all 0.2s;
+    box-shadow: none;
+    font-weight: bold;
+    padding: 0;
+  }
+
+  .send-btn:hover {
+    background: #ff9d42;
+    color: #ffffff;
+    transform: scale(1.05);
+  }
+
+  .send-btn:active {
+    transform: scale(0.95);
+  }
+
+  .send-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+  }
+
+  .spinner {
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    border: 2px solid rgba(255, 255, 255, 0.35);
+    border-top-color: #ffffff;
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+  }
+
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+
+  /* ────────── Action Buttons ────────── */
+  .action-buttons {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin: 16px 0;
+    animation: slideIn 0.4s ease-out;
+  }
+
+  .action-button {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 12px 14px;
+    background: #ffffff;
+    border: 1.5px solid #e0e8ed;
+    border-radius: 12px;
+    cursor: pointer;
+    font-size: 13px;
+    font-weight: 600;
+    color: #333;
+    transition: all 0.2s;
+    text-align: left;
+  }
+
+  .action-button:hover {
+    border-color: #ff9d42;
+    background: #fff8f3;
+    transform: translateX(4px);
+  }
+
+  .action-button:active {
+    transform: translateX(2px);
+  }
+
+  .btn-icon {
+    font-size: 18px;
+    flex-shrink: 0;
+  }
+
+  .btn-text {
+    flex: 1;
+  }
+
+  /* ────────── Scrollbar ────────── */
+  .chat-content::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  .chat-content::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .chat-content::-webkit-scrollbar-thumb {
+    background: #d0d7de;
+    border-radius: 3px;
+  }
+
+  .chat-content::-webkit-scrollbar-thumb:hover {
+    background: #999;
+  }
+
+  /* ────────── Responsive ────────── */
+  @media (max-width: 480px) {
+    .chatbot-container {
+      max-width: 100%;
+      max-height: 100vh;
+      border-radius: 0;
+    }
+
+    .greeting-text {
+      font-size: 24px;
+    }
+
+    .message-bubble {
+      max-width: 85%;
+    }
+  }
+</style>
+</head>
+<body>
+
+<div class="chatbot-container">
+  <!-- ────────── Header ────────── -->
+  <div class="header">
+    <div class="header-left">
+      <div class="logo-circle">
+        <img src="Icon/Logo02.png" alt="BhoomiSetu">
+      </div>
+      <div class="header-text">
+        <h1>
+          BhoomiSetu AI
+          <span class="verified-badge">✓</span>
+        </h1>
+        <p>Smart farming assistant</p>
+      </div>
+    </div>
+    <button class="header-menu" title="Menu">⋮</button>
+  </div>
+
+  <!-- ────────── Chat Area ────────── -->
+  <div class="chat-content">
+    <div id="messagesContainer">
+      <!-- Empty State with Greeting -->
+      <div class="empty-state">
+        <div class="animated-logo">
+          <img src="Pic/bot2.gif" alt="BhoomiSetu Bot" class="bot-gif">
+        </div>
+
+        <div class="greeting-text" id="greetingText"></div>
+        <div class="greeting-subtext"></div>
+      </div>
+
+      <!-- Messages will be added here -->
+      <div class="messages-list" id="messagesList"></div>
+    </div>
+  </div>
+
+  <div class="input-area">
+    <div class="input-box">
+      <input type="text" id="messageInput" placeholder="Ask me anything...">
+    </div>
+    <button class="send-btn" id="sendBtn" type="button" title="Send message">
+      <span id="sendBtnIcon">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"></path>
+        </svg>
+      </span>
+    </button>
+  </div>
+</div>
+
+<script>
+  const greetingText = document.getElementById('greetingText');
+  const messageInput = document.getElementById('messageInput');
+  const sendBtn = document.getElementById('sendBtn');
+  const sendBtnIcon = document.getElementById('sendBtnIcon');
+  const messagesList = document.getElementById('messagesList');
+  const messagesContainer = document.getElementById('messagesContainer');
+  const chatContent = document.querySelector('.chat-content');
+
+  // Function to extract name from JWT token/localStorage
+  function getNameFromToken() {
+    const user = localStorage.getItem('bhoomisetu_user') || sessionStorage.getItem('bhoomisetu_user');
+    
+    if (user) {
+      return user.split('@')[0] || 'Friend';
+    }
+    return 'Friend';
+  }
+
+  // Display action buttons
+  function displayActionButtons() {
+    const buttonsList = document.createElement('div');
+    buttonsList.className = 'action-buttons';
+    buttonsList.id = 'actionButtons';
+    
+    const buttons = [
+      { text: 'Crop Recommendation', icon: '🌾' },
+      { text: 'Yield Prediction', icon: '📊' },
+      { text: 'MSP Trends', icon: '💹' },
+      { text: 'Previous Chat Continuation', icon: '💬' }
+    ];
+    
+    buttons.forEach(btn => {
+      const button = document.createElement('button');
+      button.className = 'action-button';
+      button.innerHTML = `<span class="btn-icon">${btn.icon}</span><span class="btn-text">${btn.text}</span>`;
+      button.onclick = () => handleActionClick(btn.text);
+      buttonsList.appendChild(button);
+    });
+    
+    messagesList.appendChild(buttonsList);
+    setTimeout(() => {
+      chatContent.scrollTop = chatContent.scrollHeight;
+    }, 100);
+  }
+
+  // Handle action button clicks
+  function handleActionClick(buttonText) {
+    // Remove action buttons
+    const actionButtons = document.getElementById('actionButtons');
+    if (actionButtons) {
+      actionButtons.remove();
+    }
+    
+    // Add user selection as message
+    addMessage(buttonText, true);
+    
+    // Show loading message
+    setTimeout(() => {
+      addMessage(`Processing your request for: ${buttonText}...`, false);
+    }, 500);
+  }
+
+  // Initialize greeting with Namaskaram flow
+  function initializeGreeting() {
+    const userName = getNameFromToken();
+    const emptyState = document.querySelector('.empty-state');
+    
+    // Hide empty state and show Namaskaram greeting
+    setTimeout(() => {
+      emptyState.style.display = 'none';
+      
+      // Show Namaskaram greeting
+      addMessage(`Namaskaram ${userName}!`, false);
+      
+      // Show intro message after 1 second
+      setTimeout(() => {
+        addMessage('I am BhoomiSetu, How can I help you today?', false);
+      
+        
+        // Show action buttons after another 0.5 second
+        setTimeout(() => {
+          displayActionButtons();
+        }, 1000);
+      }, 1800);
+    }, 1800);
+  }
+
+  // Initialize on load
+  window.addEventListener('load', () => {
+    initializeGreeting();
+    messageInput.focus();
+  });
+
+  // Function to add a message to the chat
+  function addMessage(text, isUser) {
+    // Add bot gif on first bot message
+    if (!isUser && messagesList.children.length === 0) {
+      const gifDiv = document.createElement('div');
+      gifDiv.style.textAlign = 'center';
+      const gifImg = document.createElement('img');
+      gifImg.src = 'Pic/bot2.gif';
+      gifImg.alt = 'BhoomiSetu Bot';
+      gifImg.className = 'bot-message-avatar';
+      gifDiv.appendChild(gifImg);
+      messagesList.appendChild(gifDiv);
+    }
+
+    const messageDiv = document.createElement('div');
+    messageDiv.className = `message ${isUser ? 'user' : 'bot'}`;
+    
+    const bubble = document.createElement('div');
+    bubble.className = 'message-bubble';
+    bubble.textContent = text;
+    
+    messageDiv.appendChild(bubble);
+    messagesList.appendChild(messageDiv);
+
+    // Hide empty state and scroll to bottom
+    document.querySelector('.empty-state').style.display = 'none';
+    setTimeout(() => {
+      chatContent.scrollTop = chatContent.scrollHeight;
+    }, 100);
+  }
+
+  // Function to send message
+  async function sendMessage() {
+    const message = messageInput.value.trim();
+    
+    if (!message) return;
+
+    // Add user message to chat
+    addMessage(message, true);
+    messageInput.value = '';
+
+    // Show loading state
+    sendBtn.disabled = true;
+    sendBtnIcon.innerHTML = '<span class="spinner"></span>';
+
+    try {
+      // TODO: Replace with your actual API endpoint
+      const response = await fetch('https://bhoomisetu-t4nw.onrender.com/chat', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + (localStorage.getItem('bhoomisetu_token') || sessionStorage.getItem('bhoomisetu_token'))
+        },
+        body: JSON.stringify({
+          message: message,
+          user: localStorage.getItem('bhoomisetu_user') || sessionStorage.getItem('bhoomisetu_user')
+        })
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        const botResponse = data.response || data.message || 'I understood your message. How can I help further?';
+        addMessage(botResponse, false);
+      } else {
+        addMessage('Sorry, I encountered an error. Please try again.', false);
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      addMessage('Sorry, I could not process your request. Please check your connection and try again.', false);
+    } finally {
+      sendBtn.disabled = false;
+      sendBtnIcon.innerHTML = `
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"></path>
+        </svg>
+      `;
+    }
+  }
+
+  // Handle send button click
+  sendBtn.addEventListener('click', sendMessage);
+
+  // Handle Enter key
+  messageInput.addEventListener('keypress', (e) => {
+    if (e.key === 'Enter' && !e.shiftKey) {
+      e.preventDefault();
+      sendMessage();
+    }
+  });
+
+  // Update greeting every minute
+  setInterval(initializeGreeting, 60000);
+</script>
+
+</body>
+</html>
