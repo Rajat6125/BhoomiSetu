@@ -34,27 +34,28 @@ class CropService:
         self.features = list(self.feature_mapping.keys())
 
     def load_data(self):
-        res = supabase.table("crop_recommendation").select("*").execute()
-        df = pd.DataFrame(res.data)
+    res = supabase.table("crop_recommendation").select("*").execute()
 
-        if df.empty:
-            raise ValueError("crop_recommendation table is empty")
+    print("RAW DATA SAMPLE:", res.data[:2])
 
-        print("Original crop columns:", df.columns.tolist())
-        
-        # No need to rename columns, just work with original names
-        # The label column is fine as 'label'
-        
-        if 'label' not in df.columns:
-            raise ValueError("Column 'label' not found in crop_recommendation table")
+    df = pd.DataFrame(res.data)
 
-        crops = sorted(df['label'].unique())
-        self.id_map = {i: c for i, c in enumerate(crops)}
-        reverse = {c: i for i, c in self.id_map.items()}
+    print("DATAFRAME SHAPE:", df.shape)
+    print("COLUMNS:", df.columns.tolist())
 
-        df['label_id'] = df['label'].map(reverse)
+    if df.empty:
+        raise ValueError("crop_recommendation table is empty")
 
-        return df
+    # 🔥 DROP NULLS (CRITICAL FIX)
+    df = df.dropna()
+
+    if df.empty:
+        raise ValueError("All rows contain NULL values")
+
+    if 'label' not in df.columns:
+        raise ValueError("Column 'label' not found")
+
+    return df
 
     def train(self):
         df = self.load_data()
@@ -197,24 +198,16 @@ yield_service = None
 def register_ml_routes(app):
     global crop_service, yield_service
     
-    crop_service = CropService()
-    yield_service = YieldService()
+    try:
+        crop_service = CropService()
+        yield_service = YieldService()
 
-    print("🚀 Training ML models...")
-    crop_service.train()
-    yield_service.train()
-    print("✅ ML models ready")
+        print("🚀 Training ML models...")
+        crop_service.train()
+        yield_service.train()
+        print("✅ ML models ready")
 
-    @app.route('/predict', methods=['POST'])
-    def predict_crop():
-        data = request.get_json()
-        result = crop_service.predict(data)
-        return jsonify(result)
-
-    @app.route('/predict_yield', methods=['POST'])
-    def predict_yield():
-        data = request.get_json()
-        result = yield_service.predict(data)
-        return jsonify({
-            "yield_kg_per_ha": round(result, 2)
-        })
+    except Exception as e:
+        print("❌ ML TRAINING FAILED:", str(e))
+        crop_service = None
+        yield_service = None
