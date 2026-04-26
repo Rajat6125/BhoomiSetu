@@ -1084,48 +1084,67 @@
 
   // ── your original sendMessage — only change: passes chat_session if one exists ──
   async function sendMessage() {
-    const message = messageInput.value.trim();
-    if (!message) return;
+  const message = messageInput.value.trim();
+  if (!message) return;
 
-    addMessage(message, true);
+  const lowerMsg = message.toLowerCase();
+
+  // ── OPTION HANDLER ──
+  if (lowerMsg.includes("services")) {
+    addMessage(message, true); // show user message
     messageInput.value = '';
 
-    sendBtn.disabled = true;
-    sendBtnIcon.innerHTML = '<span class="spinner"></span>';
+    addMessage("Here are your options 👇", false);
 
-    try {
-      const response = await fetch(`${BASE_URL}/chat`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'Authorization': 'Bearer ' + getToken()
-        },
-        body: JSON.stringify({
-          message: message,
-          chat_session: currentChatSession || undefined,
-          user: localStorage.getItem('bhoomisetu_user') || sessionStorage.getItem('bhoomisetu_user')
-        })
-      });
+    setTimeout(() => {
+      displayActionButtons();
+    }, 500);
 
-      if (response.ok) {
-        const data = await response.json();
-        const botResponse = data.reply || data.response || data.message || 'I understood your message. How can I help further?';
-        addMessage(botResponse, false);
-      } else {
-        addMessage('Sorry, I encountered an error. Please try again.', false);
-      }
-    } catch (error) {
-      console.error('Error:', error);
-      addMessage('Sorry, I could not process your request. Please check your connection and try again.', false);
-    } finally {
-      sendBtn.disabled = false;
-      sendBtnIcon.innerHTML = `
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-          <path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"></path>
-        </svg>
-      `;
-    }
+    return;
   }
+
+  // ── NORMAL FLOW ──
+  addMessage(message, true);
+  messageInput.value = '';
+
+  sendBtn.disabled = true;
+  sendBtnIcon.innerHTML = '<span class="spinner"></span>';
+
+  try {
+    const response = await fetch(`${BASE_URL}/chat`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + getToken()
+      },
+      body: JSON.stringify({
+        message: message,
+        chat_session: currentChatSession || undefined,
+        user: localStorage.getItem('bhoomisetu_user') || sessionStorage.getItem('bhoomisetu_user')
+      })
+    });
+
+    if (response.ok) {
+      const data = await response.json();
+      const botResponse =
+        data.reply || data.response || data.message || 'I understood your message. How can I help further?';
+
+      addMessage(botResponse, false);
+    } else {
+      addMessage('Sorry, I encountered an error. Please try again.', false);
+    }
+  } catch (error) {
+    console.error('Error:', error);
+    addMessage('Sorry, I could not process your request. Please check your connection and try again.', false);
+  } finally {
+    sendBtn.disabled = false;
+    sendBtnIcon.innerHTML = `
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"></path>
+      </svg>
+    `;
+  }
+}
 
   sendBtn.addEventListener('click', sendMessage);
   messageInput.addEventListener('keypress', (e) => {
