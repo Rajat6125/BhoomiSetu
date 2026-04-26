@@ -438,18 +438,24 @@
     margin-bottom: 12px;
   }
 
-  .form-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 10px;
-    margin-bottom: 12px;
-  }
+.form-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  gap: 10px;
+  margin-bottom: 12px;
+}
 
   .form-group {
     display: flex;
     flex-direction: column;
     gap: 4px;
   }
+
+  .form-group input,
+.form-group select {
+  width: 100%;
+  min-width: 0;
+}
 
   .form-group.full-width {
     grid-column: 1 / -1;
