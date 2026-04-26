@@ -34,28 +34,28 @@ class CropService:
         self.features = list(self.feature_mapping.keys())
 
     def load_data(self):
-    res = supabase.table("crop_recommendation").select("*").execute()
+        res = supabase.table("crop_recommendation").select("*").execute()
 
-    print("RAW DATA SAMPLE:", res.data[:2])
+        print("RAW DATA SAMPLE:", res.data[:2])
 
-    df = pd.DataFrame(res.data)
+        df = pd.DataFrame(res.data)
 
-    print("DATAFRAME SHAPE:", df.shape)
-    print("COLUMNS:", df.columns.tolist())
+        print("DATAFRAME SHAPE:", df.shape)
+        print("COLUMNS:", df.columns.tolist())
 
-    if df.empty:
-        raise ValueError("crop_recommendation table is empty")
+        if df.empty:
+            raise ValueError("crop_recommendation table is empty")
 
-    # 🔥 DROP NULLS (CRITICAL FIX)
-    df = df.dropna()
+        # 🔥 DROP NULLS (CRITICAL FIX)
+        df = df.dropna()
 
-    if df.empty:
-        raise ValueError("All rows contain NULL values")
+        if df.empty:
+            raise ValueError("All rows contain NULL values")
 
-    if 'label' not in df.columns:
-        raise ValueError("Column 'label' not found")
+        if 'label' not in df.columns:
+            raise ValueError("Column 'label' not found")
 
-    return df
+        return df
 
     def train(self):
         df = self.load_data()
