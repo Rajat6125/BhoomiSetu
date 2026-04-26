@@ -587,6 +587,32 @@
     0%, 60%, 100% { transform: translateY(0); background: #aaa; }
     30% { transform: translateY(-5px); background: #ff9d42; }
   }
+  /*--------------------------------------------------------------------------------------------------------------------------------*/
+  /* Crop Image Bubble */
+.crop-image-card {
+  width: 140px;
+  height: 140px;
+  border-radius: 16px;
+  overflow: hidden;
+  margin: 6px 0 4px 0;
+  box-shadow: 0 8px 20px rgba(0,0,0,0.12);
+  animation: messageIn 0.3s ease-out;
+}
+
+.crop-image-card img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* slight glow vibe */
+.crop-image-card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(255,157,66,0.2), transparent);
+  pointer-events: none;
+}
 </style>
 </head>
 <body>
@@ -650,6 +676,34 @@
   const messagesList = document.getElementById('messagesList');
   const messagesContainer = document.getElementById('messagesContainer');
   const chatContent = document.querySelector('.chat-content');
+
+  const CROP_IMAGES = {
+    rice:        "Pic/crop_rice.jpg",
+    maize:       "Pic/crop_maize.jpg",
+    chickpea:    "Pic/crop_chickpeas.jpg",
+    kidneybeans: "Pic/crop_kidney_beans.jpg",
+    pigeonpeas:  "Pic/crop_kidney_beans.jpg",
+    mothbeans:   "Pic/crop_monthbean.jpg",
+    mungbean:    "Pic/crop_monthbean.jpg",
+    blackgram:   "Pic/crop_blackgram.jpg",
+    lentil:      "Pic/crop_lentil.jpg",
+    pomegranate: "Pic/crop_pomegranate.jpg",
+    banana:      "Pic/crop_banana.jpg",
+    mango:       "Pic/crop_mango.jpg",
+    grapes:      "Pic/crop_grapes.jpg",
+    watermelon:  "Pic/crop_mellon.jpg",
+    muskmelon:   "Pic/crop_mellon.jpg",
+    apple:       "Pic/crop_apple.jpg",
+    orange:      "Pic/crop_orange.jpg",
+    papaya:      "Pic/crop_papaya.jpg",
+    coconut:     "Pic/crop_coconut.jpg",
+    cotton:      "Pic/crop_cotton2.jpg",
+    jute:        "Pic/crop_jute.jpg",
+    coffee:      "Pic/crop_coffee1.jpg",
+
+    default: "https://images.unsplash.com/photo-1501004318641-b39e6451bec6"
+    };
+
 
   const BASE_URL = 'https://bhoomisetu-t4nw.onrender.com';
   let currentChatSession = null;
