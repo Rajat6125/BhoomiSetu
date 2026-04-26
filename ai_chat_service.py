@@ -16,69 +16,74 @@ class FarmAdvisorChat:
 
         # choose a model from OpenRouter
         self.model = "meta-llama/llama-3.1-8b-instruct"
-        # other options:
-        # mistralai/mistral-7b-instruct
-        # google/gemini-2.0-flash-exp
-        # openai/gpt-4o-mini
-
 
     def ask_model(self, session_id, user_prompt):
 
+        # Initialize session with STRICT system prompt
         if session_id not in self.sessions:
             self.sessions[session_id] = [
                 {
-                    "role":"system",
-                    "content":"You are an expert agricultural advisor helping farmers."
+                    "role": "system",
+                    "content": (
+                        "You are an expert agricultural advisor helping farmers. "
+                        "Always reply in SHORT, DIRECT points. "
+                        "Max 2-4 lines per response. "
+                        "No long explanations, no extra text, no exaggeration. "
+                        "Use simple farmer-friendly language. "
+                        "If answer is long, split into 2-4 parts using '||'."
+                    )
                 }
             ]
 
         # add user message
         self.sessions[session_id].append(
             {
-                "role":"user",
-                "content":user_prompt
+                "role": "user",
+                "content": user_prompt
             }
         )
 
         response = client.chat.completions.create(
             model=self.model,
             messages=self.sessions[session_id],
-            temperature=0.7
+            temperature=0.5,
+            max_tokens=120   # limits response size
         )
 
-        reply = response.choices[0].message.content
+        reply = response.choices[0].message.content.strip()
 
-        # save assistant reply in chat memory
-        self.sessions[session_id].append(
-            {
-                "role":"assistant",
-                "content":reply
-            }
-        )
+        # Split into multiple small messages if needed
+        parts = [p.strip() for p in reply.split("||") if p.strip()]
 
-        return reply
+        # Save each part separately
+        for part in parts:
+            self.sessions[session_id].append(
+                {
+                    "role": "assistant",
+                    "content": part
+                }
+            )
+
+        return parts  # returns list of short messages
 
 
     def start_crop_chat(self, session_id, crop_result, input_data):
 
         prompt = f"""
-The ML model recommended crop: {crop_result['crop']}
+Crop: {crop_result['crop']}
 Confidence: {crop_result['confidence']}
 
-Inputs:
-Nitrogen: {input_data['N']}
-Phosphorus: {input_data['P']}
-Potassium: {input_data['K']}
-Temperature: {input_data['temperature']}
-Humidity: {input_data['humidity']}
-pH: {input_data['ph']}
-Rainfall: {input_data['rainfall']}
+Conditions:
+N={input_data['N']}, P={input_data['P']}, K={input_data['K']}
+Temp={input_data['temperature']}, Humidity={input_data['humidity']}
+pH={input_data['ph']}, Rainfall={input_data['rainfall']}
 
-Explain:
-1. Why this crop was recommended
-2. Why these conditions suit it
-3. Benefits of growing it
-Use simple farmer-friendly language.
+Give:
+- Why this crop (1 line)
+- Suitability (1 line)
+- Benefit (1 line)
+
+Keep answer VERY SHORT.
 """
 
         return self.ask_model(session_id, prompt)
@@ -87,18 +92,20 @@ Use simple farmer-friendly language.
     def start_yield_chat(self, session_id, predicted_yield, input_data):
 
         prompt = f"""
-Predicted Yield: {predicted_yield} kg/ha
+Yield: {predicted_yield} kg/ha
 
-Inputs:
-State: {input_data['state_name']}
 Crop: {input_data['crop']}
 Area: {input_data['area_ha']}
-Temperature: {input_data['temperature']}
+Temp: {input_data['temperature']}
 Humidity: {input_data['humidity']}
 pH: {input_data['ph']}
 Rainfall: {input_data['rainfall']}
 
-Explain why this yield may occur and how farmer can improve it.
+Give:
+- Reason for this yield (1-2 lines)
+- 1 improvement tip
+
+Keep it SHORT.
 """
 
         return self.ask_model(session_id, prompt)
@@ -107,6 +114,6 @@ Explain why this yield may occur and how farmer can improve it.
     def continue_chat(self, session_id, user_message):
 
         if session_id not in self.sessions:
-            return "No active chat found."
+            return ["No active chat found."]
 
         return self.ask_model(session_id, user_message)
