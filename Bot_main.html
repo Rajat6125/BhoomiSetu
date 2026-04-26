@@ -418,9 +418,8 @@
     }
   }
 
-  /* ══════════ NEW ADDITIONS ONLY BELOW ══════════ */
+  /* ══════════ FORM & RESULT CARDS ══════════ */
 
-  /* Inline Form Card */
   .form-card {
     background: #ffffff;
     border: 1.5px solid #ffe0b2;
@@ -587,32 +586,50 @@
     0%, 60%, 100% { transform: translateY(0); background: #aaa; }
     30% { transform: translateY(-5px); background: #ff9d42; }
   }
-  /*--------------------------------------------------------------------------------------------------------------------------------*/
-  /* Crop Image Bubble */
-.crop-image-card {
-  width: 140px;
-  height: 140px;
-  border-radius: 16px;
-  overflow: hidden;
-  margin: 6px 0 4px 0;
-  box-shadow: 0 8px 20px rgba(0,0,0,0.12);
-  animation: messageIn 0.3s ease-out;
-}
 
-.crop-image-card img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
+  /* ══════════ CROP IMAGE CARD ══════════ */
+  .crop-image-card {
+    position: relative;          /* needed for ::after */
+    width: 200px;
+    height: 140px;
+    border-radius: 16px;
+    overflow: hidden;
+    margin: 6px 0 4px 0;
+    box-shadow: 0 8px 20px rgba(0,0,0,0.14);
+    animation: messageIn 0.4s ease-out;
+    flex-shrink: 0;
+  }
 
-/* slight glow vibe */
-.crop-image-card::after {
-  content: '';
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(135deg, rgba(255,157,66,0.2), transparent);
-  pointer-events: none;
-}
+  .crop-image-card img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+  /* label badge overlaid on the image */
+  .crop-image-card .crop-img-label {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 6px 10px;
+    background: linear-gradient(transparent, rgba(0,0,0,0.55));
+    color: #fff;
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: capitalize;
+    letter-spacing: 0.3px;
+  }
+
+  /* subtle orange tint overlay */
+  .crop-image-card::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(255,157,66,0.18), transparent);
+    pointer-events: none;
+  }
 </style>
 </head>
 <body>
@@ -643,7 +660,6 @@
         <div class="animated-logo">
           <img src="Pic/bot2.gif" alt="BhoomiSetu Bot" class="bot-gif">
         </div>
-
         <div class="greeting-text" id="greetingText"></div>
         <div class="greeting-subtext"></div>
       </div>
@@ -669,14 +685,15 @@
 </div>
 
 <script>
-  const greetingText = document.getElementById('greetingText');
-  const messageInput = document.getElementById('messageInput');
-  const sendBtn = document.getElementById('sendBtn');
-  const sendBtnIcon = document.getElementById('sendBtnIcon');
-  const messagesList = document.getElementById('messagesList');
+  const greetingText    = document.getElementById('greetingText');
+  const messageInput    = document.getElementById('messageInput');
+  const sendBtn         = document.getElementById('sendBtn');
+  const sendBtnIcon     = document.getElementById('sendBtnIcon');
+  const messagesList    = document.getElementById('messagesList');
   const messagesContainer = document.getElementById('messagesContainer');
-  const chatContent = document.querySelector('.chat-content');
+  const chatContent     = document.querySelector('.chat-content');
 
+  /* ── Crop image map ─────────────────────────────────────────── */
   const CROP_IMAGES = {
     rice:        "Pic/crop_rice.jpg",
     maize:       "Pic/crop_maize.jpg",
@@ -700,15 +717,43 @@
     cotton:      "Pic/crop_cotton2.jpg",
     jute:        "Pic/crop_jute.jpg",
     coffee:      "Pic/crop_coffee1.jpg",
+    default:     "https://images.unsplash.com/photo-1501004318641-b39e6451bec6?w=400"
+  };
 
-    default: "https://images.unsplash.com/photo-1501004318641-b39e6451bec6"
-    };
+  /* ── Returns the image path for a given crop name ───────────── */
+  function getCropImageSrc(cropName) {
+    const key = cropName.toLowerCase().replace(/\s+/g, '');
+    return CROP_IMAGES[key] || CROP_IMAGES['default'];
+  }
 
+  /* ── Inserts a crop image bubble (bot-side) ─────────────────── */
+  function addCropImage(cropName) {
+    const wrap = document.createElement('div');
+    wrap.className = 'message bot';
+
+    const card = document.createElement('div');
+    card.className = 'crop-image-card';
+
+    const img = document.createElement('img');
+    img.src = getCropImageSrc(cropName);
+    img.alt = cropName;
+    // fallback to default if local image missing
+    img.onerror = () => { img.src = CROP_IMAGES['default']; };
+
+    const label = document.createElement('div');
+    label.className = 'crop-img-label';
+    label.textContent = cropName;
+
+    card.appendChild(img);
+    card.appendChild(label);
+    wrap.appendChild(card);
+    addElement(wrap);
+  }
 
   const BASE_URL = 'https://bhoomisetu-t4nw.onrender.com';
   let currentChatSession = null;
 
-  // ── your original helpers ──
+  /* ── Auth helpers ─────────────────────────────────────────────── */
   function getNameFromToken() {
     const user = localStorage.getItem('bhoomisetu_user') || sessionStorage.getItem('bhoomisetu_user');
     if (user) return user.split('@')[0] || 'Friend';
@@ -719,7 +764,7 @@
     return localStorage.getItem('bhoomisetu_token') || sessionStorage.getItem('bhoomisetu_token') || '';
   }
 
-  // ── your original addMessage ──
+  /* ── addMessage ───────────────────────────────────────────────── */
   function addMessage(text, isUser) {
     if (!isUser && messagesList.children.length === 0) {
       const gifDiv = document.createElement('div');
@@ -744,14 +789,14 @@
     setTimeout(() => { chatContent.scrollTop = chatContent.scrollHeight; }, 100);
   }
 
-  // ── NEW: helper to inject any element into the messages list ──
+  /* ── addElement: inject any DOM node into the message list ────── */
   function addElement(el) {
     document.querySelector('.empty-state').style.display = 'none';
     messagesList.appendChild(el);
     setTimeout(() => { chatContent.scrollTop = chatContent.scrollHeight; }, 100);
   }
 
-  // ── NEW: typing indicator ──
+  /* ── Typing indicator ─────────────────────────────────────────── */
   function showTyping() {
     const wrap = document.createElement('div');
     wrap.className = 'message bot';
@@ -768,7 +813,7 @@
     document.getElementById('typingIndicator')?.remove();
   }
 
-  // ── your original displayActionButtons ──
+  /* ── Action buttons ───────────────────────────────────────────── */
   function displayActionButtons() {
     const buttonsList = document.createElement('div');
     buttonsList.className = 'action-buttons';
@@ -776,8 +821,8 @@
 
     const buttons = [
       { text: 'Crop Recommendation', icon: '🌾' },
-      { text: 'Yield Prediction', icon: '📊' },
-      { text: 'MSP Trends', icon: '💹' },
+      { text: 'Yield Prediction',    icon: '📊' },
+      { text: 'MSP Trends',          icon: '💹' },
       { text: 'Previous Chat Continuation', icon: '💬' }
     ];
 
@@ -793,7 +838,7 @@
     setTimeout(() => { chatContent.scrollTop = chatContent.scrollHeight; }, 100);
   }
 
-  // ── UPDATED: handleActionClick now shows form or coming-soon ──
+  /* ── handleActionClick ────────────────────────────────────────── */
   function handleActionClick(buttonText) {
     document.getElementById('actionButtons')?.remove();
     addMessage(buttonText, true);
@@ -815,7 +860,6 @@
       }, 900);
 
     } else {
-      // your original fallback
       showTyping();
       setTimeout(() => {
         hideTyping();
@@ -824,7 +868,7 @@
     }
   }
 
-  // ── NEW: Crop Recommendation Form ──
+  /* ── Crop Recommendation Form ─────────────────────────────────── */
   function showCropForm() {
     const card = document.createElement('div');
     card.className = 'form-card';
@@ -892,7 +936,10 @@
     try {
       const res = await fetch(`${BASE_URL}/predict_with_chat`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + getToken() },
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + getToken()
+        },
         body: JSON.stringify({
           N: parseFloat(N), P: parseFloat(P), K: parseFloat(K),
           temperature: parseFloat(temp), humidity: parseFloat(humidity),
@@ -906,6 +953,7 @@
       if (data.success) {
         currentChatSession = data.chat_session;
 
+        /* 1️⃣  Result card (crop name + confidence) */
         const confPct = Math.round((data.confidence || 0) * 100);
         const resultCard = document.createElement('div');
         resultCard.className = 'result-card';
@@ -916,10 +964,26 @@
           <div class="confidence-bar"><div class="confidence-fill" style="width:0%"></div></div>
         `;
         addElement(resultCard);
-        setTimeout(() => { resultCard.querySelector('.confidence-fill').style.width = confPct + '%'; }, 100);
+        setTimeout(() => {
+          resultCard.querySelector('.confidence-fill').style.width = confPct + '%';
+        }, 100);
 
-        if (data.explanation) addMessage(data.explanation, false);
-        setTimeout(() => addMessage('You can ask me follow-up questions about this crop or any farming tips! 💬', false), 600);
+        /* 2️⃣  Crop image */
+        setTimeout(() => {
+          addCropImage(data.crop);
+        }, 300);
+
+        /* 3️⃣  AI explanation */
+        if (data.explanation) {
+          setTimeout(() => {
+            addMessage(data.explanation, false);
+          }, 600);
+        }
+
+        /* 4️⃣  Follow-up prompt */
+        setTimeout(() => {
+          addMessage('You can ask me follow-up questions about this crop or any farming tips! 💬', false);
+        }, data.explanation ? 1200 : 700);
 
       } else {
         addMessage('Sorry, could not get a recommendation: ' + (data.error || 'Unknown error'), false);
@@ -930,7 +994,7 @@
     }
   }
 
-  // ── NEW: Yield Prediction Form ──
+  /* ── Yield Prediction Form ────────────────────────────────────── */
   const STATES = ["Andhra Pradesh","Arunachal Pradesh","Assam","Bihar","Chhattisgarh","Goa","Gujarat","Haryana","Himachal Pradesh","Jharkhand","Karnataka","Kerala","Madhya Pradesh","Maharashtra","Manipur","Meghalaya","Mizoram","Nagaland","Odisha","Punjab","Rajasthan","Sikkim","Tamil Nadu","Telangana","Tripura","Uttar Pradesh","Uttarakhand","West Bengal"];
   const CROPS  = ["Rice","Wheat","Maize","Cotton","Sugarcane","Soybean","Groundnut","Jowar","Bajra","Ragi","Barley","Gram","Tur","Mustard","Sunflower","Jute"];
 
@@ -1019,7 +1083,10 @@
     try {
       const res = await fetch(`${BASE_URL}/predict_yield_with_chat`, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + getToken() },
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + getToken()
+        },
         body: JSON.stringify({
           state_name: state, crop,
           area_ha: parseFloat(area),
@@ -1039,6 +1106,7 @@
       if (data.success) {
         currentChatSession = data.chat_session;
 
+        /* 1️⃣  Result card */
         const resultCard = document.createElement('div');
         resultCard.className = 'result-card';
         resultCard.innerHTML = `
@@ -1048,8 +1116,22 @@
         `;
         addElement(resultCard);
 
-        if (data.explanation) addMessage(data.explanation, false);
-        setTimeout(() => addMessage('Ask me how to improve this yield or any other farming questions! 💬', false), 600);
+        /* 2️⃣  Crop image */
+        setTimeout(() => {
+          addCropImage(crop);
+        }, 300);
+
+        /* 3️⃣  AI explanation */
+        if (data.explanation) {
+          setTimeout(() => {
+            addMessage(data.explanation, false);
+          }, 600);
+        }
+
+        /* 4️⃣  Follow-up prompt */
+        setTimeout(() => {
+          addMessage('Ask me how to improve this yield or any other farming questions! 💬', false);
+        }, data.explanation ? 1200 : 700);
 
       } else {
         addMessage('Sorry, could not predict yield: ' + (data.error || 'Unknown error'), false);
@@ -1060,7 +1142,7 @@
     }
   }
 
-  // ── your original initializeGreeting (100% unchanged) ──
+  /* ── Greeting ─────────────────────────────────────────────────── */
   function initializeGreeting() {
     const userName = getNameFromToken();
     const emptyState = document.querySelector('.empty-state');
@@ -1082,69 +1164,61 @@
     messageInput.focus();
   });
 
-  // ── your original sendMessage — only change: passes chat_session if one exists ──
+  /* ── sendMessage ──────────────────────────────────────────────── */
   async function sendMessage() {
-  const message = messageInput.value.trim();
-  if (!message) return;
+    const message = messageInput.value.trim();
+    if (!message) return;
 
-  const lowerMsg = message.toLowerCase();
+    const lowerMsg = message.toLowerCase();
 
-  // ── OPTION HANDLER ──
-  if (lowerMsg.includes("services")) {
-    addMessage(message, true); // show user message
+    if (lowerMsg.includes("services")) {
+      addMessage(message, true);
+      messageInput.value = '';
+      addMessage("Here are your options 👇", false);
+      setTimeout(() => { displayActionButtons(); }, 500);
+      return;
+    }
+
+    addMessage(message, true);
     messageInput.value = '';
 
-    addMessage("Here are your options 👇", false);
+    sendBtn.disabled = true;
+    sendBtnIcon.innerHTML = '<span class="spinner"></span>';
 
-    setTimeout(() => {
-      displayActionButtons();
-    }, 500);
+    try {
+      const response = await fetch(`${BASE_URL}/chat`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + getToken()
+        },
+        body: JSON.stringify({
+          message: message,
+          chat_session: currentChatSession || undefined,
+          user: localStorage.getItem('bhoomisetu_user') || sessionStorage.getItem('bhoomisetu_user')
+        })
+      });
 
-    return;
-  }
-
-  // ── NORMAL FLOW ──
-  addMessage(message, true);
-  messageInput.value = '';
-
-  sendBtn.disabled = true;
-  sendBtnIcon.innerHTML = '<span class="spinner"></span>';
-
-  try {
-    const response = await fetch(`${BASE_URL}/chat`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer ' + getToken()
-      },
-      body: JSON.stringify({
-        message: message,
-        chat_session: currentChatSession || undefined,
-        user: localStorage.getItem('bhoomisetu_user') || sessionStorage.getItem('bhoomisetu_user')
-      })
-    });
-
-    if (response.ok) {
-      const data = await response.json();
-      const botResponse =
-        data.reply || data.response || data.message || 'I understood your message. How can I help further?';
-
-      addMessage(botResponse, false);
-    } else {
-      addMessage('Sorry, I encountered an error. Please try again.', false);
+      if (response.ok) {
+        const data = await response.json();
+        const botResponse =
+          data.reply || data.response || data.message || 'I understood your message. How can I help further?';
+        addMessage(botResponse, false);
+      } else {
+        addMessage('Sorry, I encountered an error. Please try again.', false);
+      }
+    } catch (error) {
+      console.error('Error:', error);
+      addMessage('Sorry, I could not process your request. Please check your connection and try again.', false);
+    } finally {
+      sendBtn.disabled = false;
+      sendBtnIcon.innerHTML = `
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"></path>
+        </svg>
+      `;
     }
-  } catch (error) {
-    console.error('Error:', error);
-    addMessage('Sorry, I could not process your request. Please check your connection and try again.', false);
-  } finally {
-    sendBtn.disabled = false;
-    sendBtnIcon.innerHTML = `
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"></path>
-      </svg>
-    `;
   }
-}
 
   sendBtn.addEventListener('click', sendMessage);
   messageInput.addEventListener('keypress', (e) => {
@@ -1153,7 +1227,6 @@
       sendMessage();
     }
   });
-
 </script>
 
 </body>
