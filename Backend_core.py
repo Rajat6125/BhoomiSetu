@@ -25,8 +25,8 @@ if not SUPABASE_URL or not SUPABASE_KEY or not JWT_SECRET:
 supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
 app = Flask(__name__)
 
-# ── FIX 1: Single clean CORS setup ──
-CORS(app, resources={r"/*": {"origins": "*"}}, supports_credentials=False)
+CORS(app, origins=["*"])
+CORS(app, resources={r"/*": {"origins": "*"}})
 
 @app.after_request
 def after_request(response):
@@ -34,16 +34,6 @@ def after_request(response):
     response.headers.add('Access-Control-Allow-Headers', 'Content-Type,Authorization')
     response.headers.add('Access-Control-Allow-Methods', 'GET,POST,OPTIONS')
     return response
-
-# ── FIX 2: Handle OPTIONS preflight globally ──
-@app.before_request
-def handle_preflight():
-    if request.method == 'OPTIONS':
-        response = jsonify({'status': 'ok'})
-        response.headers.add('Access-Control-Allow-Origin', '*')
-        response.headers.add('Access-Control-Allow-Headers', 'Content-Type,Authorization')
-        response.headers.add('Access-Control-Allow-Methods', 'GET,POST,OPTIONS')
-        return response, 200
 
 # Initialize services
 chat_service = FarmAdvisorChat()
@@ -313,7 +303,6 @@ def chat():
 
         chat_session = data.get("chat_session")
 
-        # ── FIX 3: If no active session, start a general farming chat ──
         if not chat_session or chat_session not in chat_service.sessions:
             session_id = chat_session or str(uuid.uuid4())
             general_prompt = f"""
