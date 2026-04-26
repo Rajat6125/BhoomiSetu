@@ -95,7 +95,7 @@
 
   .header-text p {
     font-size: 11px;
-    color: #000000;
+    color: #7a8a7f;
     margin: 0;
   }
 
@@ -590,8 +590,8 @@
   /* ══════════ CROP IMAGE CARD ══════════ */
   .crop-image-card {
     position: relative;          /* needed for ::after */
-    width: 200px;
-    height: 140px;
+    width: 180px;
+    height: 180px;
     border-radius: 16px;
     overflow: hidden;
     margin: 6px 0 4px 0;
@@ -646,7 +646,7 @@
           BhoomiSetu AI
           <span class="verified-badge">✓</span>
         </h1>
-        <p>Rooted in the eath, moving towards future</p>
+        <p>Smart farming assistant</p>
       </div>
     </div>
     <button class="header-menu" title="Menu">⋮</button>
@@ -695,7 +695,7 @@
 
   /* ── Crop image map ─────────────────────────────────────────── */
   const CROP_IMAGES = {
-    Rice:        "Pic/crop_rice.jpg",
+    rice:        "Pic/crop_rice.jpg",
     maize:       "Pic/crop_maize.jpg",
     chickpea:    "Pic/crop_chickpeas.jpg",
     kidneybeans: "Pic/crop_kidney_beans.jpg",
@@ -953,37 +953,38 @@
       if (data.success) {
         currentChatSession = data.chat_session;
 
-        /* 1️⃣  Result card (crop name + confidence) */
         const confPct = Math.round((data.confidence || 0) * 100);
-        const resultCard = document.createElement('div');
-        resultCard.className = 'result-card';
-        resultCard.innerHTML = `
-          <div class="result-label">Recommended Crop</div>
-          <div class="result-value">🌱 ${data.crop}</div>
-          <div class="result-conf">Confidence: ${confPct}%</div>
-          <div class="confidence-bar"><div class="confidence-fill" style="width:0%"></div></div>
-        `;
-        addElement(resultCard);
-        setTimeout(() => {
-          resultCard.querySelector('.confidence-fill').style.width = confPct + '%';
-        }, 100);
 
-        /* 2️⃣  Crop image */
+        /* 1️⃣  Crop image FIRST */
+        addCropImage(data.crop);
+
+        /* 2️⃣  Result card (crop name + confidence) */
         setTimeout(() => {
-          addCropImage(data.crop);
+          const resultCard = document.createElement('div');
+          resultCard.className = 'result-card';
+          resultCard.innerHTML = `
+            <div class="result-label">Recommended Crop</div>
+            <div class="result-value">🌱 ${data.crop}</div>
+            <div class="result-conf">Confidence: ${confPct}%</div>
+            <div class="confidence-bar"><div class="confidence-fill" style="width:0%"></div></div>
+          `;
+          addElement(resultCard);
+          setTimeout(() => {
+            resultCard.querySelector('.confidence-fill').style.width = confPct + '%';
+          }, 100);
         }, 300);
 
         /* 3️⃣  AI explanation */
         if (data.explanation) {
           setTimeout(() => {
             addMessage(data.explanation, false);
-          }, 600);
+          }, 700);
         }
 
         /* 4️⃣  Follow-up prompt */
         setTimeout(() => {
           addMessage('You can ask me follow-up questions about this crop or any farming tips! 💬', false);
-        }, data.explanation ? 1200 : 700);
+        }, data.explanation ? 1400 : 800);
 
       } else {
         addMessage('Sorry, could not get a recommendation: ' + (data.error || 'Unknown error'), false);
@@ -1106,32 +1107,32 @@
       if (data.success) {
         currentChatSession = data.chat_session;
 
-        /* 1️⃣  Result card */
-        const resultCard = document.createElement('div');
-        resultCard.className = 'result-card';
-        resultCard.innerHTML = `
-          <div class="result-label">Predicted Yield</div>
-          <div class="result-value">🌾 ${data.yield_kg_per_ha} kg/ha</div>
-          <div class="result-conf">${crop} · ${state}</div>
-        `;
-        addElement(resultCard);
+        /* 1️⃣  Crop image FIRST */
+        addCropImage(crop);
 
-        /* 2️⃣  Crop image */
+        /* 2️⃣  Result card */
         setTimeout(() => {
-          addCropImage(crop);
+          const resultCard = document.createElement('div');
+          resultCard.className = 'result-card';
+          resultCard.innerHTML = `
+            <div class="result-label">Predicted Yield</div>
+            <div class="result-value">🌾 ${data.yield_kg_per_ha} kg/ha</div>
+            <div class="result-conf">${crop} · ${state}</div>
+          `;
+          addElement(resultCard);
         }, 300);
 
         /* 3️⃣  AI explanation */
         if (data.explanation) {
           setTimeout(() => {
             addMessage(data.explanation, false);
-          }, 600);
+          }, 700);
         }
 
         /* 4️⃣  Follow-up prompt */
         setTimeout(() => {
           addMessage('Ask me how to improve this yield or any other farming questions! 💬', false);
-        }, data.explanation ? 1200 : 700);
+        }, data.explanation ? 1400 : 800);
 
       } else {
         addMessage('Sorry, could not predict yield: ' + (data.error || 'Unknown error'), false);
