@@ -18,30 +18,31 @@
     background: #111;
     display: flex;
     justify-content: center;
-    align-items: flex-start;
+    align-items: center;
     min-height: 100vh;
-    /* REMOVED: overflow: hidden — was preventing scroll */
+    overflow-y: auto;
   }
 
   /* ── Phone Shell ── */
   .phone {
     width: 100%;
-    min-height: 100vh;        /* grows with content instead of fixed height */
+    min-height: 100vh;
+    max-height: 100vh;
+    max-height: 844px;
     background: #fff;
     position: relative;
-    overflow-x: hidden;       /* only block horizontal overflow */
-    overflow-y: auto;         /* allow vertical scroll */
+    overflow: hidden;
     box-shadow: 0 40px 120px rgba(0,0,0,0.7);
   }
+  
 
   /* ── Hero ── */
   .hero-bg {
-    position: relative;       /* changed from absolute so it flows in DOM */
-    width: 100%;
-    height: 220px;            /* fixed pixel height instead of % of locked viewport */
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 36%;
     overflow: hidden;
     z-index: 0;
-    flex-shrink: 0;
   }
   .hero-bg img {
     width: 100%; height: 115%;
@@ -61,7 +62,7 @@
     background: linear-gradient(160deg, rgba(18,45,18,0.6) 0%, rgba(0,0,0,0.05) 70%, transparent 100%);
   }
 
-  /* ── Logo (absolute within hero) ── */
+  /* ── Logo ── */
   .logo {
     position: absolute;
     top: 16px; left: 18px;
@@ -81,12 +82,14 @@
     display: none;
   }
 
-  /* ── Wave — sits between hero and card ── */
+  /* ── Wave — sits right at the top edge of .card ── */
   .wave-wrap {
-    position: relative;
+    position: absolute;
+    left: 0; right: 0;
+    /* bottom of hero = 36% of phone height; card top = 34%; wave bridges the gap */
+    bottom: calc(64% - 2px);
     z-index: 2;
-    line-height: 0;
-    margin-top: -2px;         /* close the 1px gap */
+    line-height: 0;   /* remove any inline gap under SVG */
   }
   .wave-wrap svg {
     display: block;
@@ -96,12 +99,13 @@
 
   /* ── Card ── */
   .card {
-    position: relative;
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 64%;
     background: #fff;
     border-radius: 26px 26px 0 0;
-    padding: 18px 22px 28px;  /* extra bottom padding so button isn't clipped */
+    padding: 18px 22px 14px;
     z-index: 3;
-    margin-top: -52px;        /* pull up to overlap with wave */
     display: flex;
     flex-direction: column;
   }
@@ -131,29 +135,31 @@
     color: #111; letter-spacing: -0.4px;
     line-height: 1.15;
   }
-
+  
   .fields-grid {
     display: grid;
     grid-template-columns: 1fr 1fr;
     gap: 9px 14px;
+    flex: 1;
   }
   .field { display: flex; flex-direction: column; gap: 2px; }
   .field.full { grid-column: 1 / -1; }
 
   .field-label {
     font-size: 9.5px; font-weight: 700;
-    color: #7a7270;
+    color: #7a7270;           /* was #b8b0b0 — too light */
     letter-spacing: 0.1em;
     text-transform: uppercase;
   }
 
   .input-wrap {
     display: flex; align-items: center; gap: 6px;
-    border-bottom: 1.5px solid #ddd;
+    border-bottom: 1.5px solid #ddd;  /* was #ebebeb — slightly more visible */
     padding: 5px 1px;
     transition: border-color 0.2s;
   }
   .input-wrap:focus-within { border-bottom-color: var(--brand); }
+
 
   .input-wrap svg { flex-shrink: 0; color: #8b8282; transition: color 0.2s; }
   .input-wrap:focus-within svg { color: var(--brand); }
@@ -166,7 +172,7 @@
   }
 
   .input-wrap input::placeholder {
-    color: #8d8a8a;
+    color: #8d8a8a;         
     font-size: 12.5px;
   }
 
@@ -187,14 +193,19 @@
   .divider {
     height: 1px;
     background: linear-gradient(90deg, transparent, #e0e0e0 20%, #e0e0e0 80%, transparent);
-    margin: 14px 0 10px;
+    margin: 10px 0 8px;
     flex-shrink: 0;
   }
 
   .cta-row {
-    display: flex; align-items: center; gap: 12px;
-    flex-shrink: 0;
-  }
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  position: sticky;
+  bottom: 0;
+  background: #fff;
+  padding-top: 10px;
+}
 
   .signup-btn {
     flex: 1; padding: 13px 10px;
@@ -207,6 +218,7 @@
     box-shadow: 0 8px 22px rgba(224,90,64,0.38);
     transition: transform 0.15s, box-shadow 0.15s, opacity 0.15s;
     overflow: hidden; position: relative;
+    min-width: 0;
   }
   .signup-btn::after {
     content: '';
@@ -255,8 +267,7 @@
     animation: spin 0.7s linear infinite;
     vertical-align: middle; margin-right: 5px;
   }
-
-  @keyframes fadeUp {
+ @keyframes fadeUp {
     from { opacity: 0; transform: translateY(6px); }
     to   { opacity: 1; transform: translateY(0); }
   }
@@ -268,6 +279,20 @@
   .fields-grid .field:nth-child(5) { animation-delay: 0.20s; }
   .fields-grid .field:nth-child(6) { animation-delay: 0.23s; }
   .fields-grid .field:nth-child(7) { animation-delay: 0.26s; }
+
+
+  @media (max-height: 700px) {
+  .card {
+    max-height: none;
+    height: auto;
+    overflow-y: auto;
+    padding-bottom: 30px;
+  }
+
+  .phone {
+    overflow-y: auto;
+  }
+}
 </style>
 </head>
 <body>
@@ -286,6 +311,7 @@
 
   <div class="wave-wrap">
     <svg viewBox="0 0 390 52" preserveAspectRatio="none" xmlns="http://www.w3.org/2000/svg">
+      <!-- white fill that flows down into the card -->
       <path d="M0,52 L0,30 Q65,4 130,20 Q195,36 260,16 Q325,-4 390,24 L390,52 Z" fill="#ffffff"/>
     </svg>
   </div>
@@ -293,7 +319,9 @@
   <div class="card">
 
     <div class="card-header">
-      <h2>Create Account</h2>
+      <h2>Create Account
+        
+      </h2>
     </div>
 
     <div class="fields-grid">
@@ -315,8 +343,7 @@
         </div>
         <span class="field-error" id="err-phone"></span>
       </div>
-
-      <div class="field">
+    <div class="field">
         <div class="field-label">Password</div>
         <div class="input-wrap">
           <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
@@ -385,7 +412,7 @@
 <div class="toast" id="toast"></div>
 
 <script>
-  const API_BASE = "https://bhoomisetu-t4nw.onrender.com";
+  const API_BASE = "https://bhoomisetu-t4nw.onrender.com"; 
 
   document.getElementById('bgImg').onerror = function() {
     this.src = 'https://images.pexels.com/photos/1595108/pexels-photo-1595108.jpeg?auto=compress&cs=tinysrgb&w=600';
@@ -420,13 +447,13 @@
 
   function validate(d) {
     let ok = true;
-    if (!d.name || d.name.length < 2)               { setError('err-name',    'Min 2 chars');    ok = false; }
-    if (!d.phone_email || d.phone_email.length < 3)  { setError('err-phone',  'Required');       ok = false; }
-    if (!d.password || d.password.length < 4)        { setError('err-pwd',    'Min 4 chars');    ok = false; }
-    if (d.password !== d.confirmPassword)             { setError('err-pwd2',  "Doesn't match");  ok = false; }
-    if (!d.location || d.location.length < 2)        { setError('err-location','Required');      ok = false; }
-    if (!d.farm_size || parseFloat(d.farm_size) <= 0) { setError('err-farm',  'Must be > 0');    ok = false; }
-    if (!d.primary_crop || d.primary_crop.length < 2) { setError('err-crop',  'Required');       ok = false; }
+    if (!d.name || d.name.length < 2)              { setError('err-name',     'Min 2 chars');    ok = false; }
+    if (!d.phone_email || d.phone_email.length < 3) { setError('err-phone',   'Required');       ok = false; }
+    if (!d.password || d.password.length < 4)       { setError('err-pwd',     'Min 4 chars');    ok = false; }
+    if (d.password !== d.confirmPassword)            { setError('err-pwd2',   "Doesn't match");  ok = false; }
+    if (!d.location || d.location.length < 2)       { setError('err-location','Required');       ok = false; }
+    if (!d.farm_size || parseFloat(d.farm_size) <= 0){ setError('err-farm',   'Must be > 0');    ok = false; }
+    if (!d.primary_crop || d.primary_crop.length < 2){ setError('err-crop',   'Required');       ok = false; }
     return ok;
   }
 
@@ -464,7 +491,7 @@
 
       if (res.status === 201 && data.success) {
         showToast('Account created! Redirecting…', 'success');
-        setTimeout(() => { window.location.href = "login.html"; }, 1800);
+        setTimeout(() => { window.location.href="login.html"; }, 1800);
       } else if (res.status === 409) {
         setError('err-phone', 'Account already exists');
         showToast('User already exists — please sign in.', 'error');
@@ -482,16 +509,24 @@
   }
 
   document.addEventListener('keydown', e => { if (e.key === 'Enter') handleSignup(); });
-
   (function prefillRegister() {
-    const fromLanding = localStorage.getItem('phone_email');
-    const existingUser = localStorage.getItem('bhoomisetu_user') || sessionStorage.getItem('bhoomisetu_user');
-    const value = fromLanding || existingUser;
-    if (value) {
-      document.getElementById('phoneEmail').value = value;
-      localStorage.removeItem('phone_email');
-    }
-  })();
+  // get value saved from landing page
+  const fromLanding = localStorage.getItem('phone_email');
+
+  // optional fallback (if user came from login page)
+  const existingUser =
+    localStorage.getItem('bhoomisetu_user') ||
+    sessionStorage.getItem('bhoomisetu_user');
+
+  const value = fromLanding || existingUser;
+
+  if (value) {
+    document.getElementById('phoneEmail').value = value;
+
+    // optional: clear after using (recommended)
+    localStorage.removeItem('phone_email');
+  }
+})();
 </script>
 </body>
 </html>
