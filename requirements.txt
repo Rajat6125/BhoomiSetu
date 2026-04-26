@@ -1,5 +1,6 @@
 ﻿flask-cors
 google-generativeai==0.8.5
+openai==1.76.0
 gunicorn==21.2.0
 annotated-doc==0.0.4
 annotated-types==0.7.0
