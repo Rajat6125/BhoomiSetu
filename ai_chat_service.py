@@ -45,9 +45,9 @@ class FarmAdvisorChat:
 
         response = client.chat.completions.create(
             model=self.model,
-            messages=self.sessions[session_id],
+            messages = self.sessions[session_id][-6:]  ,
             temperature=0.5,
-            max_tokens=120   # limits response size
+            max_tokens=60   # limits response size
         )
 
         reply = response.choices[0].message.content.strip()
