@@ -2,7 +2,9 @@ from flask import Flask, request, jsonify
 from supabase import create_client
 from flask_cors import CORS
 from dotenv import load_dotenv
-from ml_service import register_ml_routes
+from ml_service import register_ml_routes, crop_service, yield_service
+from ai_chat_service import FarmAdvisorChat
+import uuid
 import os
 import jwt
 import datetime
@@ -23,10 +25,7 @@ if not SUPABASE_URL or not SUPABASE_KEY or not JWT_SECRET:
 supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
 app = Flask(__name__)
 
-CORS(app, origins=[
-    "*"
-])
-
+CORS(app, origins=["*"])
 CORS(app, resources={r"/*": {"origins": "*"}})
 
 @app.after_request
@@ -34,6 +33,10 @@ def after_request(response):
     response.headers.add('Access-Control-Allow-Headers', 'Content-Type,Authorization')
     response.headers.add('Access-Control-Allow-Methods', 'GET,POST,OPTIONS')
     return response
+
+# Initialize services
+chat_service = FarmAdvisorChat()
+
 #OPTIONAL PROTECTED ROUTE DECORATOR -------------------- #
 def token_required(f):
     @wraps(f)
@@ -212,6 +215,108 @@ def login():
         }), 500
 
 
+# -------------------- CROP PREDICTION ROUTE -------------------- #
+@app.route('/predict_with_chat', methods=['POST'])
+def predict_crop_with_chat():
+    try:
+        data = request.get_json()
+        
+        if crop_service is None:
+            return jsonify({
+                "success": False,
+                "error": "Crop prediction service not available. Please try again later."
+            }), 503
+        
+        result = crop_service.predict(data)
+        
+        session_id = str(uuid.uuid4())
+        
+        explanation = chat_service.start_crop_chat(
+            session_id,
+            result,
+            data
+        )
+        
+        return jsonify({
+            "success": True,
+            "crop": result["crop"],
+            "confidence": result["confidence"],
+            "explanation": explanation,
+            "chat_session": session_id
+        })
+    
+    except Exception as e:
+        return jsonify({
+            "success": False,
+            "error": str(e)
+        }), 500
+
+
+# -------------------- YIELD PREDICTION ROUTE -------------------- #
+@app.route('/predict_yield_with_chat', methods=['POST'])
+def predict_yield_with_chat():
+    try:
+        data = request.get_json()
+        
+        if yield_service is None:
+            return jsonify({
+                "success": False,
+                "error": "Yield prediction service not available. Please try again later."
+            }), 503
+        
+        result = yield_service.predict(data)
+        
+        session_id = str(uuid.uuid4())
+        
+        explanation = chat_service.start_yield_chat(
+            session_id,
+            result,
+            data
+        )
+        
+        return jsonify({
+            "success": True,
+            "yield_kg_per_ha": round(result, 2),
+            "explanation": explanation,
+            "chat_session": session_id
+        })
+    
+    except Exception as e:
+        return jsonify({
+            "success": False,
+            "error": str(e)
+        }), 500
+
+
+# -------------------- CHAT ROUTE -------------------- #
+@app.route('/chat', methods=['POST'])
+def chat():
+    try:
+        data = request.get_json()
+        
+        if "chat_session" not in data or "message" not in data:
+            return jsonify({
+                "success": False,
+                "error": "chat_session and message are required"
+            }), 400
+        
+        reply = chat_service.continue_chat(
+            data["chat_session"],
+            data["message"]
+        )
+        
+        return jsonify({
+            "success": True,
+            "reply": reply
+        })
+    
+    except Exception as e:
+        return jsonify({
+            "success": False,
+            "error": str(e)
+        }), 500
+
+
 # -------------------- TEST PROTECTED ROUTE -------------------- #
 @app.route('/profile', methods=['GET'])
 @token_required
@@ -232,11 +337,10 @@ def health():
 
 # -------------------- REGISTER ML ROUTES -------------------- #
 print("Before ML routes")
-register_ml_routes(app)
+register_ml_routes(app)  # This will train the models and create the services
 print("After ML routes")
 
 # -------------------- RUN -------------------- #
 if __name__ == "__main__":
-    import os
     port = int(os.environ.get("PORT", 10000))
     app.run(host="0.0.0.0", port=port)

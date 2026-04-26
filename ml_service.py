@@ -188,9 +188,15 @@ class YieldService:
         return max(0, float(pred))
 
 
+# ---------------- CREATE GLOBAL INSTANCES ---------------- #
+# Create the service instances at module level so they can be imported
+crop_service = None
+yield_service = None
+
 # ---------------- REGISTER ROUTES ---------------- #
 def register_ml_routes(app):
-
+    global crop_service, yield_service
+    
     crop_service = CropService()
     yield_service = YieldService()
 
