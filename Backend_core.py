@@ -25,14 +25,25 @@ if not SUPABASE_URL or not SUPABASE_KEY or not JWT_SECRET:
 supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
 app = Flask(__name__)
 
-CORS(app, origins=["*"])
-CORS(app, resources={r"/*": {"origins": "*"}})
+# ── FIX 1: Single clean CORS setup ──
+CORS(app, resources={r"/*": {"origins": "*"}}, supports_credentials=False)
 
 @app.after_request
 def after_request(response):
+    response.headers.add('Access-Control-Allow-Origin', '*')
     response.headers.add('Access-Control-Allow-Headers', 'Content-Type,Authorization')
     response.headers.add('Access-Control-Allow-Methods', 'GET,POST,OPTIONS')
     return response
+
+# ── FIX 2: Handle OPTIONS preflight globally ──
+@app.before_request
+def handle_preflight():
+    if request.method == 'OPTIONS':
+        response = jsonify({'status': 'ok'})
+        response.headers.add('Access-Control-Allow-Origin', '*')
+        response.headers.add('Access-Control-Allow-Headers', 'Content-Type,Authorization')
+        response.headers.add('Access-Control-Allow-Methods', 'GET,POST,OPTIONS')
+        return response, 200
 
 # Initialize services
 chat_service = FarmAdvisorChat()
@@ -294,16 +305,36 @@ def chat():
     try:
         data = request.get_json()
         
-        if "chat_session" not in data or "message" not in data:
+        if "message" not in data:
             return jsonify({
                 "success": False,
-                "error": "chat_session and message are required"
+                "error": "message is required"
             }), 400
-        
-        reply = chat_service.continue_chat(
-            data["chat_session"],
-            data["message"]
-        )
+
+        chat_session = data.get("chat_session")
+
+        # ── FIX 3: If no active session, start a general farming chat ──
+        if not chat_session or chat_session not in chat_service.sessions:
+            session_id = chat_session or str(uuid.uuid4())
+            general_prompt = f"""
+You are BhoomiSetu AI, a helpful and friendly agricultural assistant for Indian farmers.
+Answer the following question in simple, practical language.
+If the question is not farming-related, gently redirect to farming topics.
+
+Question: {data['message']}
+"""
+            chat = chat_service.model.start_chat(history=[])
+            response = chat.send_message(general_prompt)
+            chat_service.sessions[session_id] = chat
+
+            return jsonify({
+                "success": True,
+                "reply": response.text,
+                "chat_session": session_id
+            })
+
+        # Existing session — continue normally
+        reply = chat_service.continue_chat(chat_session, data["message"])
         
         return jsonify({
             "success": True,
@@ -337,7 +368,7 @@ def health():
 
 # -------------------- REGISTER ML ROUTES -------------------- #
 print("Before ML routes")
-register_ml_routes(app)  # This will train the models and create the services
+register_ml_routes(app)
 print("After ML routes")
 
 # -------------------- RUN -------------------- #
