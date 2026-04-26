@@ -6,7 +6,7 @@ genai.configure(api_key=os.getenv("GEMINI_API_KEY"))
 
 class FarmAdvisorChat:
     def __init__(self):
-        self.model = genai.GenerativeModel("gemini-1.5-flash-latest")
+        self.model = genai.GenerativeModel("gemini-pro")
         self.sessions = {}   # stores chats by session id
 
     def start_crop_chat(self, session_id, crop_result, input_data):
