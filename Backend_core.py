@@ -2,7 +2,8 @@ from flask import Flask, request, jsonify
 from supabase import create_client
 from flask_cors import CORS
 from dotenv import load_dotenv
-from ml_service import register_ml_routes, crop_service, yield_service
+import ml_service
+from ml_service import register_ml_routes
 from ai_chat_service import FarmAdvisorChat
 import uuid
 import os
@@ -221,23 +222,23 @@ def login():
 def predict_crop_with_chat():
     try:
         data = request.get_json()
-        
-        if crop_service is None:
+
+        if ml_service.crop_service is None:
             return jsonify({
                 "success": False,
                 "error": "Crop prediction service not available. Please try again later."
             }), 503
-        
-        result = crop_service.predict(data)
-        
+
+        result = ml_service.crop_service.predict(data)
+
         session_id = str(uuid.uuid4())
-        
+
         explanation = chat_service.start_crop_chat(
             session_id,
             result,
             data
         )
-        
+
         return jsonify({
             "success": True,
             "crop": result["crop"],
@@ -245,13 +246,12 @@ def predict_crop_with_chat():
             "explanation": explanation,
             "chat_session": session_id
         })
-    
+
     except Exception as e:
         return jsonify({
             "success": False,
             "error": str(e)
         }), 500
-
 
 # -------------------- YIELD PREDICTION ROUTE -------------------- #
 @app.route('/predict_yield_with_chat', methods=['POST'])
@@ -259,13 +259,13 @@ def predict_yield_with_chat():
     try:
         data = request.get_json()
         
-        if yield_service is None:
+        if ml_service.yield_service is None:
             return jsonify({
                 "success": False,
                 "error": "Yield prediction service not available. Please try again later."
             }), 503
         
-        result = yield_service.predict(data)
+        result = ml_service.yield_service.predict(data)
         
         session_id = str(uuid.uuid4())
         
