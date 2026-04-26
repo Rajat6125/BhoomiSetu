@@ -209,5 +209,5 @@ def register_ml_routes(app):
 
     except Exception as e:
         print("❌ ML TRAINING FAILED:", str(e))
-        crop_service = None
-        yield_service = None
+        crop_service = CropService()
+        yield_service = YieldService()
