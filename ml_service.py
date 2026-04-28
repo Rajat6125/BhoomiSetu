@@ -62,10 +62,14 @@ class CropService:
         )
 
         self.model = XGBClassifier(
-            n_estimators=100,
-            learning_rate=0.1,
-            eval_metric="mlogloss",
-            random_state=42
+        n_estimators=400,
+        max_depth=6,
+        learning_rate=0.03,
+        subsample=0.8,
+        colsample_bytree=0.8,
+        objective='multi:softprob',
+        eval_metric='mlogloss',
+        random_state=42
         )
 
         self.model.fit(X_train, y_train)

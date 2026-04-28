@@ -199,7 +199,7 @@ def login():
         token = jwt.encode(
             {
                 "user_id": db_user["user_id"],
-                "exp": datetime.datetime.utcnow() + datetime.timedelta(hours=24)
+                "exp": datetime.datetime.utcnow() + datetime.timedelta(minutes=15)
             },
             JWT_SECRET,
             algorithm="HS256"
