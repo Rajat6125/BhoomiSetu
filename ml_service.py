@@ -69,7 +69,7 @@ class CropService:
         colsample_bytree=0.8,
         objective='multi:softprob',
         eval_metric='mlogloss',
-        random_state=42
+        random_state=43
         )
 
         self.model.fit(X_train, y_train)
