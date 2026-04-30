@@ -49,7 +49,7 @@ class CropService:
 
         X = df[['N', 'P', 'K', 'temperature', 'humidity', 'ph', 'rainfall']]
 
-        # ✅ FIX: encode string labels
+        # ✅ encode string labels
         y = self.label_encoder.fit_transform(df['label'])
 
         # Map back for prediction output
@@ -62,14 +62,14 @@ class CropService:
         )
 
         self.model = XGBClassifier(
-        n_estimators=400,
-        max_depth=6,
-        learning_rate=0.03,
-        subsample=0.8,
-        colsample_bytree=0.8,
-        objective='multi:softprob',
-        eval_metric='mlogloss',
-        random_state=43
+            n_estimators=400,
+            max_depth=6,
+            learning_rate=0.03,
+            subsample=0.8,
+            colsample_bytree=0.8,
+            objective='multi:softprob',
+            eval_metric='mlogloss',
+            random_state=43
         )
 
         self.model.fit(X_train, y_train)
@@ -103,6 +103,7 @@ class CropService:
         except KeyError as e:
             raise ValueError(f"Missing input field: {str(e)}")
 
+
 # ----------------------------------------------------
 # ---------------- YIELD PREDICTION ---------------- #
 # ----------------------------------------------------
@@ -130,7 +131,8 @@ class YieldService:
     def train(self):
         df = self.load_data()
 
-        # ✅ FIX: normalise keys to lowercase + stripped so lookups are case-insensitive
+        # ✅ FIX: strip + lowercase every key so lookups are case-insensitive
+        # Dataset has mixed casing e.g. "Chhattisgarh", "rice" — normalise all of it
         self.state_map = {
             s.strip().lower(): i for i, s in enumerate(df['State_Name'].unique())
         }
@@ -139,6 +141,10 @@ class YieldService:
             c.strip().lower(): i for i, c in enumerate(df['Crop'].unique())
         }
 
+        print("✅ State map keys (sample):", list(self.state_map.keys())[:5])
+        print("✅ Crop map keys:", list(self.crop_map.keys()))
+
+        # ✅ FIX: normalise the DataFrame columns the same way before mapping
         df['state_code'] = df['State_Name'].str.strip().str.lower().map(self.state_map)
         df['crop_code']  = df['Crop'].str.strip().str.lower().map(self.crop_map)
 
@@ -178,17 +184,28 @@ class YieldService:
             raise ValueError("❌ Yield model not trained")
 
         try:
-            # ✅ FIX: normalise incoming values before lookup (strip + lowercase)
-            state_key = data['state_name'].strip().lower()
-            crop_key  = data['crop'].strip().lower()
+            # ✅ FIX: normalise incoming values to match the normalised map keys
+            state_key = str(data['state_name']).strip().lower()
+            crop_key  = str(data['crop']).strip().lower()
 
+            print(f"🔍 Looking up state: '{state_key}', crop: '{crop_key}'")
+            print(f"🔍 Available states (sample): {list(self.state_map.keys())[:5]}")
+            print(f"🔍 Available crops: {list(self.crop_map.keys())}")
+
+            # ✅ FIX: use .get() instead of direct dict access — gives clean error, not KeyError
             state_code = self.state_map.get(state_key)
             if state_code is None:
-                raise ValueError(f"Unknown state: '{data['state_name']}'. Check spelling or casing.")
+                raise ValueError(
+                    f"Unknown state: '{data['state_name']}'. "
+                    f"Available: {list(self.state_map.keys())}"
+                )
 
             crop_code = self.crop_map.get(crop_key)
             if crop_code is None:
-                raise ValueError(f"Unknown crop: '{data['crop']}'. Check spelling or casing.")
+                raise ValueError(
+                    f"Unknown crop: '{data['crop']}'. "
+                    f"Available: {list(self.crop_map.keys())}"
+                )
 
             x = [[
                 state_code,
