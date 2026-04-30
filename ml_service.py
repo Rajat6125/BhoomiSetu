@@ -26,15 +26,46 @@ def normalise(text):
     'Andhra Pradesh' -> 'andhrapradesh'
     """
     text = str(text)
-    # Normalise unicode (NFKD removes accents, zero-width chars, etc.)
     text = unicodedata.normalize('NFKD', text)
-    # Encode to ASCII bytes ignoring non-ASCII, decode back
     text = text.encode('ascii', 'ignore').decode('ascii')
-    # Lowercase and strip
     text = text.strip().lower()
-    # Remove ALL non-alphanumeric characters (spaces, hyphens, dots, etc.)
     text = re.sub(r'[^a-z0-9]', '', text)
     return text
+
+
+# ---------------- HELPER: paginated fetch (bypasses 1000-row Supabase limit) ---------------- #
+def fetch_all_rows(table_name):
+    """
+    Supabase .select("*") returns max 1000 rows by default.
+    This fetches all rows in pages of 1000 until the table is fully loaded.
+    """
+    all_rows = []
+    page_size = 1000
+    offset = 0
+
+    while True:
+        res = (
+            supabase
+            .table(table_name)
+            .select("*")
+            .range(offset, offset + page_size - 1)
+            .execute()
+        )
+
+        if not res.data:
+            break
+
+        all_rows.extend(res.data)
+        print(f"  📦 Fetched {len(all_rows)} rows from '{table_name}' so far...")
+
+        # If we got fewer rows than page_size, we've hit the end
+        if len(res.data) < page_size:
+            break
+
+        offset += page_size
+
+    print(f"  ✅ Total rows fetched from '{table_name}': {len(all_rows)}")
+    return all_rows
 
 
 # ---------------- CROP RECOMMENDATION ---------------- #
@@ -45,12 +76,12 @@ class CropService:
         self.id_map = {}
 
     def load_data(self):
-        res = supabase.table("crop_recommendation").select("*").execute()
+        rows = fetch_all_rows("crop_recommendation")
 
-        if not res.data:
+        if not rows:
             raise ValueError("❌ crop_recommendation table is empty")
 
-        df = pd.DataFrame(res.data)
+        df = pd.DataFrame(rows)
 
         print("📊 Crop data loaded:", df.shape)
         print("Columns:", df.columns.tolist())
@@ -129,16 +160,16 @@ class CropService:
 class YieldService:
     def __init__(self):
         self.model = None
-        self.state_map = {}   # normalised_key -> index
-        self.crop_map  = {}   # normalised_key -> index
+        self.state_map = {}
+        self.crop_map  = {}
 
     def load_data(self):
-        res = supabase.table("crop_yield").select("*").execute()
+        rows = fetch_all_rows("crop_yield")
 
-        if not res.data:
+        if not rows:
             raise ValueError("❌ crop_yield table is empty")
 
-        df = pd.DataFrame(res.data)
+        df = pd.DataFrame(rows)
 
         print("📊 Yield data loaded:", df.shape)
 
@@ -150,7 +181,7 @@ class YieldService:
     def train(self):
         df = self.load_data()
 
-        # ✅ FIX: use aggressive normalise() — removes spaces, unicode, punctuation
+        # Build normalised maps — now covers ALL rows, not just first 1000
         self.state_map = {
             normalise(s): i for i, s in enumerate(df['State_Name'].unique())
         }
@@ -162,7 +193,6 @@ class YieldService:
         print("✅ State map keys:", list(self.state_map.keys()))
         print("✅ Crop map keys:", list(self.crop_map.keys()))
 
-        # ✅ FIX: normalise DataFrame columns the same way before mapping
         df['state_code'] = df['State_Name'].apply(normalise).map(self.state_map)
         df['crop_code']  = df['Crop'].apply(normalise).map(self.crop_map)
 
@@ -202,14 +232,11 @@ class YieldService:
             raise ValueError("❌ Yield model not trained")
 
         try:
-            # ✅ FIX: apply same aggressive normalise() on incoming values
             state_key = normalise(data['state_name'])
             crop_key  = normalise(data['crop'])
 
             print(f"🔍 Normalised state key: '{state_key}'")
             print(f"🔍 Normalised crop key:  '{crop_key}'")
-            print(f"🔍 State map keys: {list(self.state_map.keys())}")
-            print(f"🔍 Crop map keys:  {list(self.crop_map.keys())}")
 
             state_code = self.state_map.get(state_key)
             if state_code is None:
