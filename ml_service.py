@@ -130,17 +130,17 @@ class YieldService:
     def train(self):
         df = self.load_data()
 
-        # Encode categorical columns
+        # ✅ FIX: normalise keys to lowercase + stripped so lookups are case-insensitive
         self.state_map = {
-            s: i for i, s in enumerate(df['State_Name'].unique())
+            s.strip().lower(): i for i, s in enumerate(df['State_Name'].unique())
         }
 
         self.crop_map = {
-            c: i for i, c in enumerate(df['Crop'].unique())
+            c.strip().lower(): i for i, c in enumerate(df['Crop'].unique())
         }
 
-        df['state_code'] = df['State_Name'].map(self.state_map)
-        df['crop_code'] = df['Crop'].map(self.crop_map)
+        df['state_code'] = df['State_Name'].str.strip().str.lower().map(self.state_map)
+        df['crop_code']  = df['Crop'].str.strip().str.lower().map(self.crop_map)
 
         X = df[
             [
@@ -178,9 +178,21 @@ class YieldService:
             raise ValueError("❌ Yield model not trained")
 
         try:
+            # ✅ FIX: normalise incoming values before lookup (strip + lowercase)
+            state_key = data['state_name'].strip().lower()
+            crop_key  = data['crop'].strip().lower()
+
+            state_code = self.state_map.get(state_key)
+            if state_code is None:
+                raise ValueError(f"Unknown state: '{data['state_name']}'. Check spelling or casing.")
+
+            crop_code = self.crop_map.get(crop_key)
+            if crop_code is None:
+                raise ValueError(f"Unknown crop: '{data['crop']}'. Check spelling or casing.")
+
             x = [[
-                self.state_map[data['state_name']],
-                self.crop_map[data['crop']],
+                state_code,
+                crop_code,
                 float(data['area_ha']),
                 float(data.get('total_n_kg', 0)),
                 float(data.get('total_p_kg', 0)),
