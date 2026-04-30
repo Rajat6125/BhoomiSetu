@@ -7,12 +7,34 @@ from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import LabelEncoder
 from supabase import create_client
 import os
+import unicodedata
+import re
 
 # ---------------- SUPABASE INIT ---------------- #
 SUPABASE_URL = os.getenv("SUPABASE_URL")
 SUPABASE_KEY = os.getenv("SUPABASE_KEY")
 
 supabase = create_client(SUPABASE_URL, SUPABASE_KEY)
+
+
+# ---------------- HELPER: aggressive normalise ---------------- #
+def normalise(text):
+    """
+    Strip whitespace, lowercase, remove all non-alphanumeric characters,
+    and normalise unicode (e.g. accented chars, zero-width spaces).
+    'Chhattisgarh ' -> 'chhattisgarh'
+    'Andhra Pradesh' -> 'andhrapradesh'
+    """
+    text = str(text)
+    # Normalise unicode (NFKD removes accents, zero-width chars, etc.)
+    text = unicodedata.normalize('NFKD', text)
+    # Encode to ASCII bytes ignoring non-ASCII, decode back
+    text = text.encode('ascii', 'ignore').decode('ascii')
+    # Lowercase and strip
+    text = text.strip().lower()
+    # Remove ALL non-alphanumeric characters (spaces, hyphens, dots, etc.)
+    text = re.sub(r'[^a-z0-9]', '', text)
+    return text
 
 
 # ---------------- CROP RECOMMENDATION ---------------- #
@@ -33,7 +55,6 @@ class CropService:
         print("📊 Crop data loaded:", df.shape)
         print("Columns:", df.columns.tolist())
 
-        # Drop nulls
         df = df.dropna()
 
         if df.empty:
@@ -49,10 +70,8 @@ class CropService:
 
         X = df[['N', 'P', 'K', 'temperature', 'humidity', 'ph', 'rainfall']]
 
-        # ✅ encode string labels
         y = self.label_encoder.fit_transform(df['label'])
 
-        # Map back for prediction output
         self.id_map = {
             i: label for i, label in enumerate(self.label_encoder.classes_)
         }
@@ -110,8 +129,8 @@ class CropService:
 class YieldService:
     def __init__(self):
         self.model = None
-        self.state_map = {}
-        self.crop_map = {}
+        self.state_map = {}   # normalised_key -> index
+        self.crop_map  = {}   # normalised_key -> index
 
     def load_data(self):
         res = supabase.table("crop_yield").select("*").execute()
@@ -131,22 +150,21 @@ class YieldService:
     def train(self):
         df = self.load_data()
 
-        # ✅ FIX: strip + lowercase every key so lookups are case-insensitive
-        # Dataset has mixed casing e.g. "Chhattisgarh", "rice" — normalise all of it
+        # ✅ FIX: use aggressive normalise() — removes spaces, unicode, punctuation
         self.state_map = {
-            s.strip().lower(): i for i, s in enumerate(df['State_Name'].unique())
+            normalise(s): i for i, s in enumerate(df['State_Name'].unique())
         }
 
         self.crop_map = {
-            c.strip().lower(): i for i, c in enumerate(df['Crop'].unique())
+            normalise(c): i for i, c in enumerate(df['Crop'].unique())
         }
 
-        print("✅ State map keys (sample):", list(self.state_map.keys())[:5])
+        print("✅ State map keys:", list(self.state_map.keys()))
         print("✅ Crop map keys:", list(self.crop_map.keys()))
 
-        # ✅ FIX: normalise the DataFrame columns the same way before mapping
-        df['state_code'] = df['State_Name'].str.strip().str.lower().map(self.state_map)
-        df['crop_code']  = df['Crop'].str.strip().str.lower().map(self.crop_map)
+        # ✅ FIX: normalise DataFrame columns the same way before mapping
+        df['state_code'] = df['State_Name'].apply(normalise).map(self.state_map)
+        df['crop_code']  = df['Crop'].apply(normalise).map(self.crop_map)
 
         X = df[
             [
@@ -184,26 +202,28 @@ class YieldService:
             raise ValueError("❌ Yield model not trained")
 
         try:
-            # ✅ FIX: normalise incoming values to match the normalised map keys
-            state_key = str(data['state_name']).strip().lower()
-            crop_key  = str(data['crop']).strip().lower()
+            # ✅ FIX: apply same aggressive normalise() on incoming values
+            state_key = normalise(data['state_name'])
+            crop_key  = normalise(data['crop'])
 
-            print(f"🔍 Looking up state: '{state_key}', crop: '{crop_key}'")
-            print(f"🔍 Available states (sample): {list(self.state_map.keys())[:5]}")
-            print(f"🔍 Available crops: {list(self.crop_map.keys())}")
+            print(f"🔍 Normalised state key: '{state_key}'")
+            print(f"🔍 Normalised crop key:  '{crop_key}'")
+            print(f"🔍 State map keys: {list(self.state_map.keys())}")
+            print(f"🔍 Crop map keys:  {list(self.crop_map.keys())}")
 
-            # ✅ FIX: use .get() instead of direct dict access — gives clean error, not KeyError
             state_code = self.state_map.get(state_key)
             if state_code is None:
                 raise ValueError(
-                    f"Unknown state: '{data['state_name']}'. "
+                    f"Unknown state: '{data['state_name']}' "
+                    f"(normalised: '{state_key}'). "
                     f"Available: {list(self.state_map.keys())}"
                 )
 
             crop_code = self.crop_map.get(crop_key)
             if crop_code is None:
                 raise ValueError(
-                    f"Unknown crop: '{data['crop']}'. "
+                    f"Unknown crop: '{data['crop']}' "
+                    f"(normalised: '{crop_key}'). "
                     f"Available: {list(self.crop_map.keys())}"
                 )
 
