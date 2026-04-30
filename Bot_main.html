@@ -36,6 +36,7 @@
     overflow: hidden;
   }
 
+  /* ── Main container – true flex column filling the viewport slot ── */
   .chatbot-container {
     width: 100%;
     max-width: 420px;
@@ -44,13 +45,14 @@
     background: #ffffff;
     border-radius: 32px;
     box-shadow: 0 30px 80px rgba(0, 0, 0, 0.15), 0 0 1px rgba(0, 0, 0, 0.05);
+
+    /* KEY: column flex so header + chat + input stack and chat scrolls */
     display: flex;
     flex-direction: column;
-    overflow: hidden;
+    overflow: hidden;   /* clips child border-radii */
     position: relative;
   }
 
-  /* ── Ambient glow background ──────────────────── */
   .chatbot-container::before {
     content: '';
     position: absolute;
@@ -63,15 +65,18 @@
     z-index: 0;
   }
 
-  /* ────────── Header (FIXED) ────────── */
+  /* ────────── Header — FIXED (flex-shrink:0 keeps it from collapsing) ── */
   .header {
     background: linear-gradient(135deg, rgba(255, 157, 66, 0.95) 0%, rgba(255, 122, 61, 0.92) 100%);
     padding: 18px 20px;
     display: flex;
     align-items: center;
     justify-content: space-between;
+
+    /* Never shrink, never grow — always its natural height */
     flex-shrink: 0;
-    border-bottom: none;
+    flex-grow: 0;
+
     position: relative;
     z-index: 20;
     backdrop-filter: blur(10px);
@@ -112,7 +117,7 @@
 
   @keyframes subtle-pulse {
     0%, 100% { transform: scale(1); }
-    50% { transform: scale(1.05); }
+    50%       { transform: scale(1.05); }
   }
 
   .logo-circle img {
@@ -124,15 +129,15 @@
   .header-text h1 {
     font-size: 17px;
     font-weight: 700;
-    color: #ffffff;
+    color: #3f1919;
     margin: 0;
     display: flex;
     align-items: center;
     gap: 8px;
     letter-spacing: -0.3px;
+    font-family: 'tahoma', serif;
+    font-size: 18px;
   }
-
-  .header-text h1 { font-family: 'Cormorant', serif; font-size: 18px; font-weight: 700; }
 
   .verified-badge {
     width: 18px;
@@ -150,13 +155,13 @@
   }
 
   @keyframes bounce-badge {
-    0%, 100% { transform: scale(1); }
-    50% { transform: scale(1.2); }
+    0%, 100% { transform: scale(1);   }
+    50%       { transform: scale(1.2); }
   }
 
   .header-text p {
     font-size: 11px;
-    color: rgba(255, 255, 255, 0.85);
+    color: rgba(0, 0, 0, 0.85);
     margin: 0;
     font-weight: 500;
     letter-spacing: 0.3px;
@@ -185,9 +190,10 @@
     transform: scale(1.1) rotate(90deg);
   }
 
-  /* ────────── Chat Content (SCROLLABLE) ────────── */
+  /* ────────── Chat content — SCROLLABLE, fills all remaining space ── */
   .chat-content {
-    flex: 1;
+    flex: 1 1 0;          /* grow to fill, can shrink, base 0 */
+    min-height: 0;        /* critical — allows flex child to scroll */
     overflow-y: auto;
     overflow-x: hidden;
     padding: 24px 18px;
@@ -223,23 +229,12 @@
     margin: 6px 0;
   }
 
-  .message.user {
-    justify-content: flex-end;
-  }
-
-  .message.bot {
-    justify-content: flex-start;
-  }
+  .message.user { justify-content: flex-end; }
+  .message.bot  { justify-content: flex-start; }
 
   @keyframes messageIn {
-    from {
-      opacity: 0;
-      transform: translateY(16px) scale(0.94);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0) scale(1);
-    }
+    from { opacity: 0; transform: translateY(16px) scale(0.94); }
+    to   { opacity: 1; transform: translateY(0)    scale(1);    }
   }
 
   .message-bubble {
@@ -267,6 +262,7 @@
     border: 1px solid #efefef;
   }
 
+  /* ════════ Empty / greeting state ════════ */
   .empty-state {
     display: flex;
     flex-direction: column;
@@ -284,14 +280,11 @@
   }
 
   @keyframes float-smooth {
-    0%, 100% { transform: translateY(0px) rotate(0deg); }
-    50% { transform: translateY(-12px) rotate(2deg); }
+    0%, 100% { transform: translateY(0px)   rotate(0deg); }
+    50%       { transform: translateY(-12px) rotate(2deg); }
   }
 
-  .logo-svg {
-    width: 100%;
-    height: 100%;
-  }
+  .logo-svg { width: 100%; height: 100%; }
 
   .bot-gif {
     width: 100%;
@@ -327,28 +320,16 @@
   }
 
   @keyframes slideInDown {
-    from {
-      opacity: 0;
-      transform: translateY(-20px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
+    from { opacity: 0; transform: translateY(-20px); }
+    to   { opacity: 1; transform: translateY(0);     }
   }
 
   @keyframes slideInUp {
-    from {
-      opacity: 0;
-      transform: translateY(20px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
+    from { opacity: 0; transform: translateY(20px); }
+    to   { opacity: 1; transform: translateY(0);    }
   }
 
-  /* ────────── Input Area (FIXED) ────────── */
+  /* ────────── Input area — FIXED at bottom (flex-shrink:0) ────────── */
   .input-area {
     background: linear-gradient(180deg, #ffffff 0%, #fafbfc 100%);
     padding: 14px 18px 20px 18px;
@@ -356,7 +337,10 @@
     display: flex;
     gap: 14px;
     align-items: flex-end;
-    flex-shrink: 0;
+
+    flex-shrink: 0;   /* never compress */
+    flex-grow: 0;
+
     position: relative;
     z-index: 15;
     box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.04);
@@ -392,10 +376,7 @@
     font-weight: 500;
   }
 
-  .input-box input::placeholder {
-    color: #bbb;
-    font-weight: 500;
-  }
+  .input-box input::placeholder { color: #bbb; font-weight: 500; }
 
   .send-btn {
     width: 40px;
@@ -421,15 +402,8 @@
     box-shadow: 0 10px 24px rgba(255, 157, 66, 0.4);
   }
 
-  .send-btn:active {
-    transform: scale(0.96);
-  }
-
-  .send-btn:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
-    transform: none;
-  }
+  .send-btn:active  { transform: scale(0.96); }
+  .send-btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
 
   .spinner {
     display: inline-block;
@@ -441,11 +415,9 @@
     animation: spin 0.8s linear infinite;
   }
 
-  @keyframes spin {
-    to { transform: rotate(360deg); }
-  }
+  @keyframes spin { to { transform: rotate(360deg); } }
 
-  /* ────────── Action Buttons ────────── */
+  /* ════════ Action buttons ════════ */
   .action-buttons {
     width: 100%;
     display: flex;
@@ -479,9 +451,7 @@
     box-shadow: 0 6px 16px rgba(255, 157, 66, 0.15);
   }
 
-  .action-button:active {
-    transform: translateX(4px) scale(0.98);
-  }
+  .action-button:active { transform: translateX(4px) scale(0.98); }
 
   .btn-icon {
     font-size: 20px;
@@ -490,487 +460,41 @@
   }
 
   @keyframes wiggle {
-    0%, 100% { transform: rotate(0deg); }
-    25% { transform: rotate(-3deg); }
-    75% { transform: rotate(3deg); }
+    0%, 100% { transform: rotate(0deg);  }
+    25%       { transform: rotate(-3deg); }
+    75%       { transform: rotate(3deg);  }
   }
 
-  .action-button:hover .btn-icon {
-    animation: spin 0.6s linear infinite;
-  }
+  .action-button:hover .btn-icon { animation: spin 0.6s linear infinite; }
 
-  .btn-text {
-    flex: 1;
-    letter-spacing: 0.2px;
-  }
+  .btn-text { flex: 1; letter-spacing: 0.2px; }
 
-  /* ────────── Scrollbar ────────── */
-  .chat-content::-webkit-scrollbar {
-    width: 7px;
-  }
-
-  .chat-content::-webkit-scrollbar-track {
-    background: transparent;
-  }
-
+  /* ════════ Scrollbar ════════ */
+  .chat-content::-webkit-scrollbar       { width: 7px; }
+  .chat-content::-webkit-scrollbar-track { background: transparent; }
   .chat-content::-webkit-scrollbar-thumb {
     background: linear-gradient(180deg, #ff9d42, #ff7a3d);
     border-radius: 3.5px;
     box-shadow: 0 0 10px rgba(255, 157, 66, 0.2);
   }
-
   .chat-content::-webkit-scrollbar-thumb:hover {
     background: linear-gradient(180deg, #ff8c2a, #ff6a2c);
   }
 
-  /* ════════════ LOADING ANIMATION ════════════ */
-  .loading-container {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    padding: 16px 0;
-    animation: fadeIn 0.3s ease-out;
-  }
-
-  @keyframes fadeIn {
-    from { opacity: 0; }
-    to { opacity: 1; }
-  }
-
-  .loading-gif {
-    width: 48px;
-    height: 48px;
-    animation: spin 2s linear infinite;
-  }
-
-  /* ────────── Responsive ────────── */
-  @media (max-width: 768px) {
-    .chatbot-container {
-      max-width: 100%;
-      max-height: 100vh;
-      border-radius: 0;
-    }
-
-    .header {
-      padding: 12px 14px;
-      gap: 8px;
-    }
-
-    .header-left {
-      gap: 10px;
-    }
-
-    .logo-circle {
-      width: 40px;
-      height: 40px;
-      min-width: 40px;
-    }
-
-    .header-text h1 {
-      font-size: 15px;
-      gap: 6px;
-    }
-
-    .header-text p {
-      font-size: 10px;
-    }
-
-    .verified-badge {
-      width: 16px;
-      height: 16px;
-      font-size: 10px;
-    }
-
-    .header-menu {
-      width: 32px;
-      height: 32px;
-      font-size: 16px;
-      flex-shrink: 0;
-    }
-
-    .chat-content {
-      padding: 16px 12px;
-    }
-
-    .input-area {
-      padding: 10px 12px 14px 12px;
-      gap: 10px;
-    }
-
-    .input-box {
-      padding: 8px 10px;
-      border-radius: 12px;
-    }
-
-    .input-box input {
-      font-size: 13px;
-    }
-
-    .send-btn {
-      width: 36px;
-      height: 36px;
-      min-width: 36px;
-      min-height: 36px;
-      flex-shrink: 0;
-    }
-
-    .send-btn svg {
-      width: 18px;
-      height: 18px;
-    }
-
-    .greeting-text {
-      font-size: 24px;
-      margin-bottom: 8px;
-    }
-
-    .greeting-subtext {
-      font-size: 12px;
-      margin-bottom: 24px;
-    }
-
-    .animated-logo {
-      width: 150px;
-      height: 150px;
-      margin-bottom: 16px;
-    }
-
-    .message-bubble {
-      max-width: 85%;
-      padding: 10px 14px;
-      font-size: 13px;
-    }
-
-    .action-button {
-      padding: 12px 14px;
-      font-size: 12px;
-      gap: 12px;
-      border-radius: 12px;
-    }
-
-    .btn-icon {
-      font-size: 18px;
-    }
-
-    .form-card {
-      padding: 14px;
-      border-radius: 14px;
-      margin: 2px 0;
-    }
-
-    .form-card h3 {
-      font-size: 13px;
-      margin-bottom: 10px;
-    }
-
-    .form-grid {
-      gap: 10px;
-      margin-bottom: 10px;
-    }
-
-    .form-grid {
-      grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
-    }
-
-    .form-group label {
-      font-size: 9px;
-    }
-
-    .form-group input,
-    .form-group select {
-      padding: 7px 10px;
-      font-size: 12px;
-      border-radius: 8px;
-    }
-
-    .form-submit-btn {
-      padding: 10px;
-      font-size: 12px;
-      border-radius: 10px;
-    }
-
-    .result-card {
-      padding: 12px 14px;
-      border-radius: 14px;
-    }
-
-    .result-label {
-      font-size: 9px;
-      margin-bottom: 6px;
-    }
-
-    .result-value {
-      font-size: 20px;
-      margin-bottom: 4px;
-    }
-
-    .result-conf {
-      font-size: 11px;
-    }
-
-    .confidence-bar {
-      height: 5px;
-      margin-top: 8px;
-    }
-
-    .crop-image-card {
-      width: 160px;
-      height: 160px;
-      border-radius: 14px;
-      margin: 6px 0 4px 0;
-      border: 1px solid rgba(255, 255, 255, 0.4);
-    }
-
-    .crop-image-card .crop-img-label {
-      padding: 6px 10px;
-      font-size: 12px;
-    }
-
-    .typing-bubble {
-      padding: 10px 12px;
-      border-radius: 16px;
-      border-bottom-left-radius: 4px;
-    }
-
-    .typing-dot {
-      width: 7px;
-      height: 7px;
-    }
-
-    .action-buttons {
-      margin: 12px 0;
-      gap: 10px;
-    }
-
-    .loading-gif {
-      width: 40px;
-      height: 40px;
-    }
-  }
-
+  /* ════════ Responsive ════════ */
   @media (max-width: 480px) {
     .chatbot-container {
       max-width: 100%;
       max-height: 100vh;
       border-radius: 0;
     }
-
-    .header {
-      padding: 10px 12px;
-    }
-
-    .header-left {
-      gap: 8px;
-    }
-
-    .logo-circle {
-      width: 36px;
-      height: 36px;
-      min-width: 36px;
-    }
-
-    .header-text h1 {
-      font-size: 14px;
-      gap: 4px;
-    }
-
-    .header-text p {
-      font-size: 9px;
-    }
-
-    .verified-badge {
-      width: 14px;
-      height: 14px;
-      font-size: 9px;
-    }
-
-    .header-menu {
-      width: 30px;
-      height: 30px;
-      font-size: 14px;
-    }
-
-    .chat-content {
-      padding: 12px 10px;
-    }
-
-    .input-area {
-      padding: 8px 10px 12px 10px;
-      gap: 8px;
-    }
-
-    .input-box {
-      padding: 6px 10px;
-      border-radius: 10px;
-    }
-
-    .input-box input {
-      font-size: 12px;
-    }
-
-    .input-box input::placeholder {
-      font-size: 12px;
-    }
-
-    .send-btn {
-      width: 34px;
-      height: 34px;
-      min-width: 34px;
-      min-height: 34px;
-    }
-
-    .send-btn svg {
-      width: 16px;
-      height: 16px;
-    }
-
-    .greeting-text {
-      font-size: 22px;
-      margin-bottom: 6px;
-    }
-
-    .greeting-subtext {
-      font-size: 11px;
-      margin-bottom: 20px;
-    }
-
-    .animated-logo {
-      width: 120px;
-      height: 120px;
-      margin-bottom: 12px;
-    }
-
-    .bot-message-avatar {
-      width: 100px;
-      height: 100px;
-    }
-
-    .message-bubble {
-      max-width: 88%;
-      padding: 9px 12px;
-      font-size: 12px;
-      border-radius: 16px;
-    }
-
-    .message.user .message-bubble {
-      border-bottom-right-radius: 4px;
-    }
-
-    .message.bot .message-bubble {
-      border-bottom-left-radius: 4px;
-    }
-
-    .action-button {
-      padding: 10px 12px;
-      font-size: 11px;
-      gap: 10px;
-      border-radius: 10px;
-    }
-
-    .btn-icon {
-      font-size: 16px;
-    }
-
-    .form-card {
-      padding: 12px;
-      border-radius: 12px;
-      margin: 2px 0;
-    }
-
-    .form-card h3 {
-      font-size: 12px;
-      margin-bottom: 8px;
-    }
-
-    .form-grid {
-      gap: 8px;
-      margin-bottom: 8px;
-      grid-template-columns: 1fr;
-    }
-
-    .form-group label {
-      font-size: 8px;
-      letter-spacing: 0.3px;
-    }
-
-    .form-group input,
-    .form-group select {
-      padding: 6px 9px;
-      font-size: 11px;
-      border-radius: 8px;
-    }
-
-    .form-submit-btn {
-      padding: 9px;
-      font-size: 11px;
-      border-radius: 8px;
-    }
-
-    .result-card {
-      padding: 10px 12px;
-      border-radius: 12px;
-    }
-
-    .result-label {
-      font-size: 8px;
-      margin-bottom: 4px;
-    }
-
-    .result-value {
-      font-size: 18px;
-      margin-bottom: 2px;
-    }
-
-    .result-conf {
-      font-size: 10px;
-    }
-
-    .confidence-bar {
-      height: 4px;
-      margin-top: 6px;
-    }
-
-    .crop-image-card {
-      width: 140px;
-      height: 140px;
-      border-radius: 12px;
-      margin: 4px 0 2px 0;
-      border: 1px solid rgba(255, 255, 255, 0.3);
-    }
-
-    .crop-image-card .crop-img-label {
-      padding: 4px 8px;
-      font-size: 10px;
-    }
-
-    .typing-bubble {
-      padding: 8px 10px;
-      gap: 4px;
-      border-radius: 14px;
-    }
-
-    .typing-dot {
-      width: 6px;
-      height: 6px;
-    }
-
-    .action-buttons {
-      margin: 10px 0;
-      gap: 8px;
-    }
-
-    .loading-gif {
-      width: 36px;
-      height: 36px;
-    }
-
-    .message {
-      margin: 4px 0;
-    }
+    .greeting-text  { font-size: 28px; }
+    .message-bubble { max-width: 85%; }
+    .header         { padding: 16px 16px; }
+    .header-text h1 { font-size: 16px; }
   }
 
-  /* ══════════ FORM & RESULT CARDS ══════════ */
-
+  /* ════════ FORM & RESULT CARDS ════════ */
   .form-card {
     background: linear-gradient(135deg, #ffffff 0%, #fafbfc 100%);
     border: 1.5px solid #ffe0b2;
@@ -1008,14 +532,9 @@
   }
 
   .form-group input,
-  .form-group select {
-    width: 100%;
-    min-width: 0;
-  }
+  .form-group select { width: 100%; min-width: 0; }
 
-  .form-group.full-width {
-    grid-column: 1 / -1;
-  }
+  .form-group.full-width { grid-column: 1 / -1; }
 
   .form-group label {
     font-size: 10px;
@@ -1081,10 +600,10 @@
     box-shadow: 0 8px 24px rgba(255, 157, 66, 0.4);
   }
 
-  .form-submit-btn:active { transform: translateY(0); }
+  .form-submit-btn:active   { transform: translateY(0); }
   .form-submit-btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
 
-  /* Result Card */
+  /* ── Result Card ── */
   .result-card {
     background: linear-gradient(135deg, #f0faf5 0%, #e8f5e9 100%);
     border: 1.5px solid #81c784;
@@ -1151,37 +670,34 @@
     box-shadow: 0 0 8px rgba(102, 187, 106, 0.3);
   }
 
-  /* Typing indicator */
-  .typing-bubble {
+  /* ════════ LOADING GIF BUBBLE ════════
+     Replaces the old three-dot typing indicator.
+     Shows loading.gif (the revolving sun) inside a
+     transparent bot-style bubble so it blends naturally. */
+  .loading-bubble-wrap {
+    display: flex;
+    justify-content: flex-start;
+    margin: 6px 0;
+    animation: messageIn 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+
+  .loading-gif-bubble {
+    /* No background/border — the gif speaks for itself */
     display: flex;
     align-items: center;
-    gap: 6px;
-    padding: 12px 16px;
-    background: #f5f5f5;
-    border-radius: 20px;
-    border-bottom-left-radius: 6px;
-    width: fit-content;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
-    border: 1px solid #efefef;
+    justify-content: center;
+    padding: 4px;
   }
 
-  .typing-dot {
-    width: 8px;
-    height: 8px;
-    border-radius: 50%;
-    background: #aaa;
-    animation: typingBounce 1.2s infinite;
+  .loading-gif-bubble img {
+    width: 64px;
+    height: 64px;
+    object-fit: contain;
+    /* subtle drop-shadow so it doesn't float flat */
+    filter: drop-shadow(0 4px 10px rgba(255, 157, 66, 0.25));
   }
 
-  .typing-dot:nth-child(2) { animation-delay: 0.15s; }
-  .typing-dot:nth-child(3) { animation-delay: 0.3s; }
-
-  @keyframes typingBounce {
-    0%, 60%, 100% { transform: translateY(0); background: #aaa; }
-    30% { transform: translateY(-8px); background: #ff9d42; }
-  }
-
-  /* ══════════ CROP IMAGE CARD ══════════ */
+  /* ════════ CROP IMAGE CARD ════════ */
   .crop-image-card {
     position: relative;
     width: 200px;
@@ -1203,11 +719,8 @@
     transition: transform 0.4s ease-out;
   }
 
-  .crop-image-card:hover img {
-    transform: scale(1.08);
-  }
+  .crop-image-card:hover img { transform: scale(1.08); }
 
-  /* label badge overlaid on the image */
   .crop-image-card .crop-img-label {
     position: absolute;
     bottom: 0;
@@ -1223,7 +736,6 @@
     font-family: 'Outfit';
   }
 
-  /* Vibrant orange tint overlay */
   .crop-image-card::after {
     content: '';
     position: absolute;
@@ -1232,45 +744,34 @@
     pointer-events: none;
   }
 
-  /* ══════════ SUBTLE ENHANCEMENTS ══════════ */
-
-  /* Smooth text selection */
-  ::selection {
-    background: #ff9d42;
-    color: #ffffff;
-  }
-
-  /* Custom focus states */
-  :focus-visible {
-    outline: 2px solid #ff9d42;
-    outline-offset: 2px;
-  }
+  /* ════════ SUBTLE ENHANCEMENTS ════════ */
+  ::selection { background: #ff9d42; color: #ffffff; }
+  :focus-visible { outline: 2px solid #ff9d42; outline-offset: 2px; }
 </style>
 </head>
 <body>
 
 <div class="chatbot-container">
-  <!-- ────────── Header (FIXED) ────────── -->
+
+  <!-- ══ Header — FIXED (flex-shrink:0, never scrolls) ══ -->
   <div class="header">
     <div class="header-left">
       <div class="logo-circle">
         <img src="Icon/Logo02.png" alt="BhoomiSetu">
       </div>
       <div class="header-text">
-        <h1>
-          BhoomiSetu AI
-          <span class="verified-badge">✓</span>
-        </h1>
+        <h1>BhoomiSetu AI</h1>
         <p>Rooted in the earth, moving towards the future</p>
       </div>
     </div>
     <button class="header-menu" title="Menu">⋮</button>
   </div>
 
-  <!-- ────────── Chat Area (SCROLLABLE) ────────── -->
+  <!-- ══ Chat area — SCROLLABLE, flex:1 fills remaining height ══ -->
   <div class="chat-content">
     <div id="messagesContainer">
-      <!-- Empty State with Greeting -->
+
+      <!-- Empty / greeting state -->
       <div class="empty-state">
         <div class="animated-logo">
           <img src="Pic/bot2.gif" alt="BhoomiSetu Bot" class="bot-gif">
@@ -1279,19 +780,20 @@
         <div class="greeting-subtext"></div>
       </div>
 
-      <!-- Messages will be added here -->
+      <!-- Messages injected here -->
       <div class="messages-list" id="messagesList"></div>
     </div>
   </div>
 
-  <!-- ────────── Input Area (FIXED) ────────── -->
+  <!-- ══ Input area — FIXED (flex-shrink:0, never scrolls) ══ -->
   <div class="input-area">
     <div class="input-box">
       <input type="text" id="messageInput" placeholder="Ask me anything...">
     </div>
     <button class="send-btn" id="sendBtn" type="button" title="Send message">
       <span id="sendBtnIcon">
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
           <path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"></path>
         </svg>
       </span>
@@ -1300,15 +802,15 @@
 </div>
 
 <script>
-  const greetingText    = document.getElementById('greetingText');
-  const messageInput    = document.getElementById('messageInput');
-  const sendBtn         = document.getElementById('sendBtn');
-  const sendBtnIcon     = document.getElementById('sendBtnIcon');
-  const messagesList    = document.getElementById('messagesList');
+  const greetingText      = document.getElementById('greetingText');
+  const messageInput      = document.getElementById('messageInput');
+  const sendBtn           = document.getElementById('sendBtn');
+  const sendBtnIcon       = document.getElementById('sendBtnIcon');
+  const messagesList      = document.getElementById('messagesList');
   const messagesContainer = document.getElementById('messagesContainer');
-  const chatContent     = document.querySelector('.chat-content');
+  const chatContent       = document.querySelector('.chat-content');
 
-  /* ── Crop image map ─────────────────────────────────────────── */
+  /* ── Crop image map ─────────────────────────────────── */
   const CROP_IMAGES = {
     rice:        "/Pic/Crop_Rice.jpg",
     maize:       "/Pic/Crop_Maize.jpg",
@@ -1335,24 +837,21 @@
     default:     "https://images.unsplash.com/photo-1501004318641-b39e6451bec6?w=400"
   };
 
-  /* ── Returns the image path for a given crop name ───────────── */
   function getCropImageSrc(cropName) {
     const key = cropName.toLowerCase().replace(/\s+/g, '');
     return CROP_IMAGES[key] || CROP_IMAGES['default'];
   }
 
-  /* ── Inserts a crop image bubble (bot-side) ─────────────────── */
   function addCropImage(cropName) {
-    const wrap = document.createElement('div');
+    const wrap  = document.createElement('div');
     wrap.className = 'message bot';
 
-    const card = document.createElement('div');
+    const card  = document.createElement('div');
     card.className = 'crop-image-card';
 
-    const img = document.createElement('img');
-    img.src = getCropImageSrc(cropName);
-    img.alt = cropName;
-    // fallback to default if local image missing
+    const img   = document.createElement('img');
+    img.src     = getCropImageSrc(cropName);
+    img.alt     = cropName;
     img.onerror = () => { img.src = CROP_IMAGES['default']; };
 
     const label = document.createElement('div');
@@ -1368,7 +867,7 @@
   const BASE_URL = 'https://bhoomisetu-t4nw.onrender.com';
   let currentChatSession = null;
 
-  /* ── Auth helpers ─────────────────────────────────────────────── */
+  /* ── Auth helpers ───────────────────────────────────── */
   function getNameFromToken() {
     const user = localStorage.getItem('bhoomisetu_user') || sessionStorage.getItem('bhoomisetu_user');
     if (user) return user.split('@')[0] || 'Friend';
@@ -1379,7 +878,7 @@
     return localStorage.getItem('bhoomisetu_token') || sessionStorage.getItem('bhoomisetu_token') || '';
   }
 
-  /* ── addMessage ───────────────────────────────────────────────── */
+  /* ── addMessage ─────────────────────────────────────── */
   function addMessage(text, isUser) {
     if (!isUser && messagesList.children.length === 0) {
       const gifDiv = document.createElement('div');
@@ -1404,21 +903,26 @@
     setTimeout(() => { chatContent.scrollTop = chatContent.scrollHeight; }, 100);
   }
 
-  /* ── addElement: inject any DOM node into the message list ────── */
+  /* ── addElement ─────────────────────────────────────── */
   function addElement(el) {
     document.querySelector('.empty-state').style.display = 'none';
     messagesList.appendChild(el);
     setTimeout(() => { chatContent.scrollTop = chatContent.scrollHeight; }, 100);
   }
 
-  /* ── Typing indicator ─────────────────────────────────────────── */
   function showTyping() {
     const wrap = document.createElement('div');
-    wrap.className = 'message bot';
+    wrap.className = 'loading-bubble-wrap';
     wrap.id = 'typingIndicator';
+
     const bubble = document.createElement('div');
-    bubble.className = 'typing-bubble';
-    bubble.innerHTML = '<div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div>';
+    bubble.className = 'loading-gif-bubble';
+
+    const gif = document.createElement('img');
+    gif.src = 'Pic/loading.gif';   /* ← your revolving-sun GIF */
+    gif.alt = 'Loading…';
+
+    bubble.appendChild(gif);
     wrap.appendChild(bubble);
     messagesList.appendChild(wrap);
     setTimeout(() => { chatContent.scrollTop = chatContent.scrollHeight; }, 100);
@@ -1428,45 +932,17 @@
     document.getElementById('typingIndicator')?.remove();
   }
 
-  /* ── Loading indicator with GIF ─────────────────────────────── */
-  function showLoading() {
-    const wrap = document.createElement('div');
-    wrap.className = 'message bot';
-    wrap.id = 'loadingIndicator';
-    
-    const loadingDiv = document.createElement('div');
-    loadingDiv.className = 'loading-container';
-    
-    const img = document.createElement('img');
-    img.src = 'Pic/sun.gif';
-    img.alt = 'Loading...';
-    img.className = 'loading-gif';
-    img.onerror = () => {
-      img.style.display = 'none';
-      loadingDiv.innerHTML = '<div class="typing-bubble"><div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div></div>';
-    };
-    
-    loadingDiv.appendChild(img);
-    wrap.appendChild(loadingDiv);
-    messagesList.appendChild(wrap);
-    setTimeout(() => { chatContent.scrollTop = chatContent.scrollHeight; }, 100);
-  }
-
-  function hideLoading() {
-    document.getElementById('loadingIndicator')?.remove();
-  }
-
-  /* ── Action buttons ───────────────────────────────────────────── */
+  /* ── Action buttons ─────────────────────────────────── */
   function displayActionButtons() {
     const buttonsList = document.createElement('div');
     buttonsList.className = 'action-buttons';
     buttonsList.id = 'actionButtons';
 
     const buttons = [
-      { text: 'Crop Recommendation', icon: '🌾' },
-      { text: 'Yield Prediction',    icon: '📊' },
-      { text: 'MSP Trends',          icon: '💹' },
-      { text: 'Previous Chat Continuation', icon: '💬' }
+      { text: 'Crop Recommendation',        icon: '🌾' },
+      { text: 'Yield Prediction',            icon: '📊' },
+      { text: 'MSP Trends',                  icon: '💹' },
+      { text: 'Previous Chat Continuation',  icon: '💬' }
     ];
 
     buttons.forEach(btn => {
@@ -1481,37 +957,37 @@
     setTimeout(() => { chatContent.scrollTop = chatContent.scrollHeight; }, 100);
   }
 
-  /* ── handleActionClick ────────────────────────────────────────── */
+  /* ── handleActionClick ──────────────────────────────── */
   function handleActionClick(buttonText) {
     document.getElementById('actionButtons')?.remove();
     addMessage(buttonText, true);
 
     if (buttonText === 'Crop Recommendation') {
-      showLoading();
+      showTyping();
       setTimeout(() => {
-        hideLoading();
+        hideTyping();
         addMessage("Sure! Fill in your soil and climate details below and I'll recommend the best crop for you 🌱", false);
         setTimeout(() => showCropForm(), 400);
       }, 900);
 
     } else if (buttonText === 'Yield Prediction') {
-      showLoading();
+      showTyping();
       setTimeout(() => {
-        hideLoading();
+        hideTyping();
         addMessage("Great! Provide your farm details below and I'll predict the expected yield 📊", false);
         setTimeout(() => showYieldForm(), 400);
       }, 900);
 
     } else {
-      showLoading();
+      showTyping();
       setTimeout(() => {
-        hideLoading();
+        hideTyping();
         addMessage(`Processing your request for: ${buttonText}...`, false);
       }, 500);
     }
   }
 
-  /* ── Crop Recommendation Form ─────────────────────────────────── */
+  /* ── Crop Recommendation Form ───────────────────────── */
   function showCropForm() {
     const card = document.createElement('div');
     card.className = 'form-card';
@@ -1574,7 +1050,7 @@
     document.getElementById('cropFormCard').remove();
 
     addMessage(`N:${N}, P:${P}, K:${K} | Temp:${temp}°C, Humidity:${humidity}%, pH:${ph}, Rainfall:${rainfall}mm`, true);
-    showLoading();
+    showTyping();
 
     try {
       const res = await fetch(`${BASE_URL}/predict_with_chat`, {
@@ -1590,18 +1066,15 @@
         })
       });
 
-      hideLoading();
+      hideTyping();
       const data = await res.json();
 
       if (data.success) {
         currentChatSession = data.chat_session;
-
         const confPct = Math.round((data.confidence || 0) * 100);
 
-        /* 1️⃣  Crop image FIRST */
         addCropImage(data.crop);
 
-        /* 2️⃣  Result card (crop name + confidence) */
         setTimeout(() => {
           const resultCard = document.createElement('div');
           resultCard.className = 'result-card';
@@ -1612,19 +1085,13 @@
             <div class="confidence-bar"><div class="confidence-fill" style="width:0%"></div></div>
           `;
           addElement(resultCard);
-          setTimeout(() => {
-            resultCard.querySelector('.confidence-fill').style.width = confPct + '%';
-          }, 100);
+          setTimeout(() => { resultCard.querySelector('.confidence-fill').style.width = confPct + '%'; }, 100);
         }, 300);
 
-        /* 3️⃣  AI explanation */
         if (data.explanation) {
-          setTimeout(() => {
-            addMessage(data.explanation, false);
-          }, 700);
+          setTimeout(() => { addMessage(data.explanation, false); }, 700);
         }
 
-        /* 4️⃣  Follow-up prompt */
         setTimeout(() => {
           addMessage('You can ask me follow-up questions about this crop or any farming tips! 💬', false);
         }, data.explanation ? 1400 : 800);
@@ -1633,12 +1100,12 @@
         addMessage('Sorry, could not get a recommendation: ' + (data.error || 'Unknown error'), false);
       }
     } catch (err) {
-      hideLoading();
+      hideTyping();
       addMessage('Sorry, there was a connection error. Please try again.', false);
     }
   }
 
-  /* ── Yield Prediction Form ────────────────────────────────────── */
+  /* ── Yield Prediction Form ──────────────────────────── */
   const STATES = ["Andhra Pradesh","Arunachal Pradesh","Assam","Bihar","Chhattisgarh","Goa","Gujarat","Haryana","Himachal Pradesh","Jharkhand","Karnataka","Kerala","Madhya Pradesh","Maharashtra","Manipur","Meghalaya","Mizoram","Nagaland","Odisha","Punjab","Rajasthan","Sikkim","Tamil Nadu","Telangana","Tripura","Uttar Pradesh","Uttarakhand","West Bengal"];
   const CROPS  = ["Rice","Wheat","Maize","Cotton","Sugarcane","Soybean","Groundnut","Jowar","Bajra","Ragi","Barley","Gram","Tur","Mustard","Sunflower","Jute"];
 
@@ -1722,7 +1189,7 @@
     document.getElementById('yieldFormCard').remove();
 
     addMessage(`${crop} in ${state}, ${area} ha`, true);
-    showLoading();
+    showTyping();
 
     try {
       const res = await fetch(`${BASE_URL}/predict_yield_with_chat`, {
@@ -1744,16 +1211,14 @@
         })
       });
 
-      hideLoading();
+      hideTyping();
       const data = await res.json();
 
       if (data.success) {
         currentChatSession = data.chat_session;
 
-        /* 1️⃣  Crop image FIRST */
         addCropImage(crop);
 
-        /* 2️⃣  Result card */
         setTimeout(() => {
           const resultCard = document.createElement('div');
           resultCard.className = 'result-card';
@@ -1765,14 +1230,10 @@
           addElement(resultCard);
         }, 300);
 
-        /* 3️⃣  AI explanation */
         if (data.explanation) {
-          setTimeout(() => {
-            addMessage(data.explanation, false);
-          }, 700);
+          setTimeout(() => { addMessage(data.explanation, false); }, 700);
         }
 
-        /* 4️⃣  Follow-up prompt */
         setTimeout(() => {
           addMessage('Ask me how to improve this yield or any other farming questions! 💬', false);
         }, data.explanation ? 1400 : 800);
@@ -1781,14 +1242,14 @@
         addMessage('Sorry, could not predict yield: ' + (data.error || 'Unknown error'), false);
       }
     } catch (err) {
-      hideLoading();
+      hideTyping();
       addMessage('Sorry, there was a connection error. Please try again.', false);
     }
   }
 
-  /* ── Greeting ─────────────────────────────────────────────────── */
+  /* ── Greeting ───────────────────────────────────────── */
   function initializeGreeting() {
-    const userName = getNameFromToken();
+    const userName   = getNameFromToken();
     const emptyState = document.querySelector('.empty-state');
 
     setTimeout(() => {
@@ -1796,9 +1257,7 @@
       addMessage(`Namaskaram ${userName}!`, false);
       setTimeout(() => {
         addMessage('I am BhoomiSetu, How can I help you today?', false);
-        setTimeout(() => {
-          displayActionButtons();
-        }, 1000);
+        setTimeout(() => { displayActionButtons(); }, 1000);
       }, 1800);
     }, 1800);
   }
@@ -1808,7 +1267,7 @@
     messageInput.focus();
   });
 
-  /* ── sendMessage ──────────────────────────────────────────────── */
+  /* ── sendMessage ────────────────────────────────────── */
   async function sendMessage() {
     const message = messageInput.value.trim();
     if (!message) return;
@@ -1829,9 +1288,9 @@
     sendBtn.disabled = true;
     sendBtnIcon.innerHTML = '<span class="spinner"></span>';
 
+    showTyping();
+
     try {
-      showLoading();
-      
       const response = await fetch(`${BASE_URL}/chat`, {
         method: 'POST',
         headers: {
@@ -1845,27 +1304,26 @@
         })
       });
 
-      hideLoading();
-      
+      hideTyping();
+
       if (response.ok) {
         const data = await response.json();
-        const botResponse =
-          data.reply || data.response || data.message || 'I understood your message. How can I help further?';
+        const botResponse = data.reply || data.response || data.message || 'I understood your message. How can I help further?';
         addMessage(botResponse, false);
       } else {
         addMessage('Sorry, I encountered an error. Please try again.', false);
       }
     } catch (error) {
-      hideLoading();
+      hideTyping();
       console.error('Error:', error);
       addMessage('Sorry, I could not process your request. Please check your connection and try again.', false);
     } finally {
       sendBtn.disabled = false;
       sendBtnIcon.innerHTML = `
-        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+             stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
           <path d="M22 2L11 13M22 2l-7 20-4-9-9-4 20-7z"></path>
-        </svg>
-      `;
+        </svg>`;
     }
   }
 
