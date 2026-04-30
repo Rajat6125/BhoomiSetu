@@ -124,7 +124,7 @@
   .header-text h1 {
     font-size: 17px;
     font-weight: 700;
-    color: #3f1919;
+    color: #ffffff;
     margin: 0;
     display: flex;
     align-items: center;
@@ -132,7 +132,7 @@
     letter-spacing: -0.3px;
   }
 
-  .header-text h1 { font-family: 'tahoma', serif; font-size: 18px; font-weight: 700; }
+  .header-text h1 { font-family: 'Cormorant', serif; font-size: 18px; font-weight: 700; }
 
   .verified-badge {
     width: 18px;
@@ -156,7 +156,7 @@
 
   .header-text p {
     font-size: 11px;
-    color: rgba(0, 0, 0, 0.85);
+    color: rgba(255, 255, 255, 0.85);
     margin: 0;
     font-weight: 500;
     letter-spacing: 0.3px;
@@ -523,7 +523,231 @@
     background: linear-gradient(180deg, #ff8c2a, #ff6a2c);
   }
 
+  /* ════════════ LOADING ANIMATION ════════════ */
+  .loading-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    padding: 16px 0;
+    animation: fadeIn 0.3s ease-out;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+
+  .loading-gif {
+    width: 48px;
+    height: 48px;
+    animation: spin 2s linear infinite;
+  }
+
   /* ────────── Responsive ────────── */
+  @media (max-width: 768px) {
+    .chatbot-container {
+      max-width: 100%;
+      max-height: 100vh;
+      border-radius: 0;
+    }
+
+    .header {
+      padding: 12px 14px;
+      gap: 8px;
+    }
+
+    .header-left {
+      gap: 10px;
+    }
+
+    .logo-circle {
+      width: 40px;
+      height: 40px;
+      min-width: 40px;
+    }
+
+    .header-text h1 {
+      font-size: 15px;
+      gap: 6px;
+    }
+
+    .header-text p {
+      font-size: 10px;
+    }
+
+    .verified-badge {
+      width: 16px;
+      height: 16px;
+      font-size: 10px;
+    }
+
+    .header-menu {
+      width: 32px;
+      height: 32px;
+      font-size: 16px;
+      flex-shrink: 0;
+    }
+
+    .chat-content {
+      padding: 16px 12px;
+    }
+
+    .input-area {
+      padding: 10px 12px 14px 12px;
+      gap: 10px;
+    }
+
+    .input-box {
+      padding: 8px 10px;
+      border-radius: 12px;
+    }
+
+    .input-box input {
+      font-size: 13px;
+    }
+
+    .send-btn {
+      width: 36px;
+      height: 36px;
+      min-width: 36px;
+      min-height: 36px;
+      flex-shrink: 0;
+    }
+
+    .send-btn svg {
+      width: 18px;
+      height: 18px;
+    }
+
+    .greeting-text {
+      font-size: 24px;
+      margin-bottom: 8px;
+    }
+
+    .greeting-subtext {
+      font-size: 12px;
+      margin-bottom: 24px;
+    }
+
+    .animated-logo {
+      width: 150px;
+      height: 150px;
+      margin-bottom: 16px;
+    }
+
+    .message-bubble {
+      max-width: 85%;
+      padding: 10px 14px;
+      font-size: 13px;
+    }
+
+    .action-button {
+      padding: 12px 14px;
+      font-size: 12px;
+      gap: 12px;
+      border-radius: 12px;
+    }
+
+    .btn-icon {
+      font-size: 18px;
+    }
+
+    .form-card {
+      padding: 14px;
+      border-radius: 14px;
+      margin: 2px 0;
+    }
+
+    .form-card h3 {
+      font-size: 13px;
+      margin-bottom: 10px;
+    }
+
+    .form-grid {
+      gap: 10px;
+      margin-bottom: 10px;
+    }
+
+    .form-grid {
+      grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+    }
+
+    .form-group label {
+      font-size: 9px;
+    }
+
+    .form-group input,
+    .form-group select {
+      padding: 7px 10px;
+      font-size: 12px;
+      border-radius: 8px;
+    }
+
+    .form-submit-btn {
+      padding: 10px;
+      font-size: 12px;
+      border-radius: 10px;
+    }
+
+    .result-card {
+      padding: 12px 14px;
+      border-radius: 14px;
+    }
+
+    .result-label {
+      font-size: 9px;
+      margin-bottom: 6px;
+    }
+
+    .result-value {
+      font-size: 20px;
+      margin-bottom: 4px;
+    }
+
+    .result-conf {
+      font-size: 11px;
+    }
+
+    .confidence-bar {
+      height: 5px;
+      margin-top: 8px;
+    }
+
+    .crop-image-card {
+      width: 160px;
+      height: 160px;
+      border-radius: 14px;
+      margin: 6px 0 4px 0;
+      border: 1px solid rgba(255, 255, 255, 0.4);
+    }
+
+    .crop-image-card .crop-img-label {
+      padding: 6px 10px;
+      font-size: 12px;
+    }
+
+    .typing-bubble {
+      padding: 10px 12px;
+      border-radius: 16px;
+      border-bottom-left-radius: 4px;
+    }
+
+    .typing-dot {
+      width: 7px;
+      height: 7px;
+    }
+
+    .action-buttons {
+      margin: 12px 0;
+      gap: 10px;
+    }
+
+    .loading-gif {
+      width: 40px;
+      height: 40px;
+    }
+  }
+
   @media (max-width: 480px) {
     .chatbot-container {
       max-width: 100%;
@@ -531,16 +755,218 @@
       border-radius: 0;
     }
 
+    .header {
+      padding: 10px 12px;
+    }
+
+    .header-left {
+      gap: 8px;
+    }
+
+    .logo-circle {
+      width: 36px;
+      height: 36px;
+      min-width: 36px;
+    }
+
+    .header-text h1 {
+      font-size: 14px;
+      gap: 4px;
+    }
+
+    .header-text p {
+      font-size: 9px;
+    }
+
+    .verified-badge {
+      width: 14px;
+      height: 14px;
+      font-size: 9px;
+    }
+
+    .header-menu {
+      width: 30px;
+      height: 30px;
+      font-size: 14px;
+    }
+
+    .chat-content {
+      padding: 12px 10px;
+    }
+
+    .input-area {
+      padding: 8px 10px 12px 10px;
+      gap: 8px;
+    }
+
+    .input-box {
+      padding: 6px 10px;
+      border-radius: 10px;
+    }
+
+    .input-box input {
+      font-size: 12px;
+    }
+
+    .input-box input::placeholder {
+      font-size: 12px;
+    }
+
+    .send-btn {
+      width: 34px;
+      height: 34px;
+      min-width: 34px;
+      min-height: 34px;
+    }
+
+    .send-btn svg {
+      width: 16px;
+      height: 16px;
+    }
+
     .greeting-text {
-      font-size: 28px;
+      font-size: 22px;
+      margin-bottom: 6px;
+    }
+
+    .greeting-subtext {
+      font-size: 11px;
+      margin-bottom: 20px;
+    }
+
+    .animated-logo {
+      width: 120px;
+      height: 120px;
+      margin-bottom: 12px;
+    }
+
+    .bot-message-avatar {
+      width: 100px;
+      height: 100px;
     }
 
     .message-bubble {
-      max-width: 85%;
+      max-width: 88%;
+      padding: 9px 12px;
+      font-size: 12px;
+      border-radius: 16px;
     }
 
-    .header { padding: 16px 16px; }
-    .header-text h1 { font-size: 16px; }
+    .message.user .message-bubble {
+      border-bottom-right-radius: 4px;
+    }
+
+    .message.bot .message-bubble {
+      border-bottom-left-radius: 4px;
+    }
+
+    .action-button {
+      padding: 10px 12px;
+      font-size: 11px;
+      gap: 10px;
+      border-radius: 10px;
+    }
+
+    .btn-icon {
+      font-size: 16px;
+    }
+
+    .form-card {
+      padding: 12px;
+      border-radius: 12px;
+      margin: 2px 0;
+    }
+
+    .form-card h3 {
+      font-size: 12px;
+      margin-bottom: 8px;
+    }
+
+    .form-grid {
+      gap: 8px;
+      margin-bottom: 8px;
+      grid-template-columns: 1fr;
+    }
+
+    .form-group label {
+      font-size: 8px;
+      letter-spacing: 0.3px;
+    }
+
+    .form-group input,
+    .form-group select {
+      padding: 6px 9px;
+      font-size: 11px;
+      border-radius: 8px;
+    }
+
+    .form-submit-btn {
+      padding: 9px;
+      font-size: 11px;
+      border-radius: 8px;
+    }
+
+    .result-card {
+      padding: 10px 12px;
+      border-radius: 12px;
+    }
+
+    .result-label {
+      font-size: 8px;
+      margin-bottom: 4px;
+    }
+
+    .result-value {
+      font-size: 18px;
+      margin-bottom: 2px;
+    }
+
+    .result-conf {
+      font-size: 10px;
+    }
+
+    .confidence-bar {
+      height: 4px;
+      margin-top: 6px;
+    }
+
+    .crop-image-card {
+      width: 140px;
+      height: 140px;
+      border-radius: 12px;
+      margin: 4px 0 2px 0;
+      border: 1px solid rgba(255, 255, 255, 0.3);
+    }
+
+    .crop-image-card .crop-img-label {
+      padding: 4px 8px;
+      font-size: 10px;
+    }
+
+    .typing-bubble {
+      padding: 8px 10px;
+      gap: 4px;
+      border-radius: 14px;
+    }
+
+    .typing-dot {
+      width: 6px;
+      height: 6px;
+    }
+
+    .action-buttons {
+      margin: 10px 0;
+      gap: 8px;
+    }
+
+    .loading-gif {
+      width: 36px;
+      height: 36px;
+    }
+
+    .message {
+      margin: 4px 0;
+    }
   }
 
   /* ══════════ FORM & RESULT CARDS ══════════ */
@@ -833,6 +1259,7 @@
       <div class="header-text">
         <h1>
           BhoomiSetu AI
+          <span class="verified-badge">✓</span>
         </h1>
         <p>Rooted in the earth, moving towards the future</p>
       </div>
@@ -1001,6 +1428,34 @@
     document.getElementById('typingIndicator')?.remove();
   }
 
+  /* ── Loading indicator with GIF ─────────────────────────────── */
+  function showLoading() {
+    const wrap = document.createElement('div');
+    wrap.className = 'message bot';
+    wrap.id = 'loadingIndicator';
+    
+    const loadingDiv = document.createElement('div');
+    loadingDiv.className = 'loading-container';
+    
+    const img = document.createElement('img');
+    img.src = 'Pic/sun.gif';
+    img.alt = 'Loading...';
+    img.className = 'loading-gif';
+    img.onerror = () => {
+      img.style.display = 'none';
+      loadingDiv.innerHTML = '<div class="typing-bubble"><div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div></div>';
+    };
+    
+    loadingDiv.appendChild(img);
+    wrap.appendChild(loadingDiv);
+    messagesList.appendChild(wrap);
+    setTimeout(() => { chatContent.scrollTop = chatContent.scrollHeight; }, 100);
+  }
+
+  function hideLoading() {
+    document.getElementById('loadingIndicator')?.remove();
+  }
+
   /* ── Action buttons ───────────────────────────────────────────── */
   function displayActionButtons() {
     const buttonsList = document.createElement('div');
@@ -1032,25 +1487,25 @@
     addMessage(buttonText, true);
 
     if (buttonText === 'Crop Recommendation') {
-      showTyping();
+      showLoading();
       setTimeout(() => {
-        hideTyping();
+        hideLoading();
         addMessage("Sure! Fill in your soil and climate details below and I'll recommend the best crop for you 🌱", false);
         setTimeout(() => showCropForm(), 400);
       }, 900);
 
     } else if (buttonText === 'Yield Prediction') {
-      showTyping();
+      showLoading();
       setTimeout(() => {
-        hideTyping();
+        hideLoading();
         addMessage("Great! Provide your farm details below and I'll predict the expected yield 📊", false);
         setTimeout(() => showYieldForm(), 400);
       }, 900);
 
     } else {
-      showTyping();
+      showLoading();
       setTimeout(() => {
-        hideTyping();
+        hideLoading();
         addMessage(`Processing your request for: ${buttonText}...`, false);
       }, 500);
     }
@@ -1119,7 +1574,7 @@
     document.getElementById('cropFormCard').remove();
 
     addMessage(`N:${N}, P:${P}, K:${K} | Temp:${temp}°C, Humidity:${humidity}%, pH:${ph}, Rainfall:${rainfall}mm`, true);
-    showTyping();
+    showLoading();
 
     try {
       const res = await fetch(`${BASE_URL}/predict_with_chat`, {
@@ -1135,7 +1590,7 @@
         })
       });
 
-      hideTyping();
+      hideLoading();
       const data = await res.json();
 
       if (data.success) {
@@ -1178,7 +1633,7 @@
         addMessage('Sorry, could not get a recommendation: ' + (data.error || 'Unknown error'), false);
       }
     } catch (err) {
-      hideTyping();
+      hideLoading();
       addMessage('Sorry, there was a connection error. Please try again.', false);
     }
   }
@@ -1267,7 +1722,7 @@
     document.getElementById('yieldFormCard').remove();
 
     addMessage(`${crop} in ${state}, ${area} ha`, true);
-    showTyping();
+    showLoading();
 
     try {
       const res = await fetch(`${BASE_URL}/predict_yield_with_chat`, {
@@ -1289,7 +1744,7 @@
         })
       });
 
-      hideTyping();
+      hideLoading();
       const data = await res.json();
 
       if (data.success) {
@@ -1326,7 +1781,7 @@
         addMessage('Sorry, could not predict yield: ' + (data.error || 'Unknown error'), false);
       }
     } catch (err) {
-      hideTyping();
+      hideLoading();
       addMessage('Sorry, there was a connection error. Please try again.', false);
     }
   }
@@ -1375,6 +1830,8 @@
     sendBtnIcon.innerHTML = '<span class="spinner"></span>';
 
     try {
+      showLoading();
+      
       const response = await fetch(`${BASE_URL}/chat`, {
         method: 'POST',
         headers: {
@@ -1388,6 +1845,8 @@
         })
       });
 
+      hideLoading();
+      
       if (response.ok) {
         const data = await response.json();
         const botResponse =
@@ -1397,6 +1856,7 @@
         addMessage('Sorry, I encountered an error. Please try again.', false);
       }
     } catch (error) {
+      hideLoading();
       console.error('Error:', error);
       addMessage('Sorry, I could not process your request. Please check your connection and try again.', false);
     } finally {
