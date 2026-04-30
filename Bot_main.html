@@ -958,34 +958,37 @@
   }
 
   /* ── handleActionClick ──────────────────────────────── */
-  function handleActionClick(buttonText) {
-    document.getElementById('actionButtons')?.remove();
-    addMessage(buttonText, true);
+  async function handleActionClick(buttonText) {
+  document.getElementById('actionButtons')?.remove();
+  addMessage(buttonText, true);
 
-    if (buttonText === 'Crop Recommendation') {
-      showTyping();
-      setTimeout(() => {
-        hideTyping();
-        addMessage("Sure! Fill in your soil and climate details below and I'll recommend the best crop for you 🌱", false);
-        setTimeout(() => showCropForm(), 400);
-      }, 900);
+  showTyping();
 
-    } else if (buttonText === 'Yield Prediction') {
-      showTyping();
-      setTimeout(() => {
-        hideTyping();
-        addMessage("Great! Provide your farm details below and I'll predict the expected yield 📊", false);
-        setTimeout(() => showYieldForm(), 400);
-      }, 900);
+  const delayTime = 1200 + Math.random() * 600;
+  const delay = new Promise(resolve => setTimeout(resolve, delayTime));
+  
+  await delay;
 
-    } else {
-      showTyping();
-      setTimeout(() => {
-        hideTyping();
-        addMessage(`Processing your request for: ${buttonText}...`, false);
-      }, 500);
-    }
+  hideTyping();
+
+  if (buttonText === 'Crop Recommendation') {
+    addMessage(
+      "Sure! Fill in your soil and climate details below and I'll recommend the best crop for you 🌱",
+      false
+    );
+    setTimeout(() => showCropForm(), 400);
+
+  } else if (buttonText === 'Yield Prediction') {
+    addMessage(
+      "Great! Provide your farm details below and I'll predict the expected yield 📊",
+      false
+    );
+    setTimeout(() => showYieldForm(), 400);
+
+  } else {
+    addMessage(`Processing your request for: ${buttonText}...`, false);
   }
+}
 
   /* ── Crop Recommendation Form ───────────────────────── */
   function showCropForm() {
