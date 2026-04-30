@@ -103,8 +103,9 @@ class CropService:
         except KeyError as e:
             raise ValueError(f"Missing input field: {str(e)}")
 
-
+# ----------------------------------------------------
 # ---------------- YIELD PREDICTION ---------------- #
+# ----------------------------------------------------
 class YieldService:
     def __init__(self):
         self.model = None
