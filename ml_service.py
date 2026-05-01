@@ -1,7 +1,9 @@
 import numpy as np
 import pandas as pd
 from flask import jsonify
-from xgboost import XGBClassifier
+# from xgboost import XGBClassifier
+
+from sklearn.ensemble import RandomForestClassifier
 from sklearn.ensemble import RandomForestRegressor
 from sklearn.model_selection import train_test_split
 from sklearn.preprocessing import LabelEncoder
@@ -111,17 +113,19 @@ class CropService:
             X, y, test_size=0.2, random_state=42
         )
 
-        self.model = XGBClassifier(
-            n_estimators=400,
-            max_depth=6,
-            learning_rate=0.03,
-            subsample=0.8,
-            colsample_bytree=0.8,
-            objective='multi:softprob',
-            eval_metric='mlogloss',
-            random_state=43
-        )
+        # self.model = XGBClassifier(
+        #     n_estimators=400,
+        #     max_depth=6,
+        #     learning_rate=0.03,
+        #     subsample=0.8,
+        #     colsample_bytree=0.8,
+        #     objective='multi:softprob',
+        #     eval_metric='mlogloss',
+        #     random_state=43
+        # )
 
+        self.model = RandomForestClassifier(
+        )
         self.model.fit(X_train, y_train)
 
         acc = self.model.score(X_test, y_test)
