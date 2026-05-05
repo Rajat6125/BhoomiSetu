@@ -1349,24 +1349,38 @@
       const decoder = new TextDecoder();
       let botBubble = null;
       let fullText = "";
+      let buffer = "";
 
       while (true) {
         const { done, value } = await reader.read();
         if (done) break;
 
-        const chunk = decoder.decode(value, { stream: true });
-        
-        if (!botBubble) {
-          botBubble = addMessage("", false);
-          botBubble.classList.add('streaming-text');
-        }
+        buffer += decoder.decode(value, { stream: true });
 
-        botBubble.textContent += chunk;
-        fullText += chunk;
-        chatContent.scrollTop = chatContent.scrollHeight;
+        // Parse SSE lines: "data: <content>\n\n"
+        const lines = buffer.split("\n");
+        buffer = lines.pop(); // keep incomplete last line
+
+        for (const line of lines) {
+          if (!line.startsWith("data: ")) continue;
+          const content = line.slice(6); // strip "data: "
+          if (content === "[DONE]") continue;
+          if (!content) continue;
+
+          // Hide typing indicator and create bubble on first real chunk
+          if (!botBubble) {
+            hideTyping();
+            botBubble = addMessage("", false);
+            botBubble.classList.add('streaming-text');
+          }
+
+          botBubble.textContent += content;
+          fullText += content;
+          chatContent.scrollTop = chatContent.scrollHeight;
+        }
       }
 
-      // Hide the sun and remove cursor when done
+      // Remove streaming cursor when done
       hideTyping();
       if (botBubble) botBubble.classList.remove('streaming-text');
 

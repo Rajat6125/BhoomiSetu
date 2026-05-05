@@ -307,14 +307,17 @@ def chat():
         def generate():
             for chunk in chat_service.continue_chat_stream(chat_session, data["message"]):
                 if chunk:
-                    yield chunk
+                    # SSE format: "data: <content>\n\n"
+                    # This reliably bypasses proxy/CDN buffering
+                    yield f"data: {chunk}\n\n"
+            yield "data: [DONE]\n\n"
 
         return Response(
             generate(),
-            mimetype='text/plain',
+            mimetype='text/event-stream',
             headers={
                 'X-Accel-Buffering': 'no',
-                'Cache-Control': 'no-cache',
+                'Cache-Control': 'no-cache, no-transform',
                 'Connection': 'keep-alive',
                 'X-Chat-Session-ID': chat_session
             }
