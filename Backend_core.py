@@ -305,10 +305,11 @@ def chat():
         
         @stream_with_context
         def generate():
+            # Force an immediate flush to bypass browser/proxy buffering
+            yield "data: \n\n" 
             for chunk in chat_service.continue_chat_stream(chat_session, data["message"]):
                 if chunk:
                     # SSE format: "data: <content>\n\n"
-                    # This reliably bypasses proxy/CDN buffering
                     yield f"data: {chunk}\n\n"
             yield "data: [DONE]\n\n"
 
