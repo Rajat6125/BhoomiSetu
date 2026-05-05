@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, Response, stream_with_context
 from supabase import create_client
 from flask_cors import CORS
 from dotenv import load_dotenv
@@ -301,34 +301,24 @@ def chat():
                 "error": "message is required"
             }), 400
 
-        chat_session = data.get("chat_session")
-
-        if not chat_session or chat_session not in chat_service.sessions:
-            session_id = chat_session or str(uuid.uuid4())
-            general_prompt = f"""
-You are BhoomiSetu AI, a helpful and friendly agricultural assistant for Indian farmers.
-Answer the following question in simple, practical language.
-If the question is not farming-related, gently redirect to farming topics.
-
-Question: {data['message']}
-"""
-            chat = chat_service.model.start_chat(history=[])
-            response = chat.send_message(general_prompt)
-            chat_service.sessions[session_id] = chat
-
-            return jsonify({
-                "success": True,
-                "reply": response.text,
-                "chat_session": session_id
-            })
-
-        # Existing session — continue normally
-        reply = chat_service.continue_chat(chat_session, data["message"])
+        chat_session = data.get("chat_session") or str(uuid.uuid4())
         
-        return jsonify({
-            "success": True,
-            "reply": reply
-        })
+        @stream_with_context
+        def generate():
+            for chunk in chat_service.continue_chat_stream(chat_session, data["message"]):
+                if chunk:
+                    yield chunk
+
+        return Response(
+            generate(),
+            mimetype='text/plain',
+            headers={
+                'X-Accel-Buffering': 'no',
+                'Cache-Control': 'no-cache',
+                'Connection': 'keep-alive',
+                'X-Chat-Session-ID': chat_session
+            }
+        )
     
     except Exception as e:
         return jsonify({
