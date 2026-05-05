@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, Response, stream_with_context
 from supabase import create_client
 from flask_cors import CORS
 from dotenv import load_dotenv
@@ -303,14 +303,22 @@ def chat():
 
         chat_session = data.get("chat_session") or str(uuid.uuid4())
         
+        @stream_with_context
         def generate():
             for chunk in chat_service.continue_chat_stream(chat_session, data["message"]):
                 if chunk:
                     yield chunk
 
-        response = app.response_class(generate(), mimetype='text/plain')
-        response.headers['X-Chat-Session-ID'] = chat_session
-        return response
+        return Response(
+            generate(),
+            mimetype='text/plain',
+            headers={
+                'X-Accel-Buffering': 'no',
+                'Cache-Control': 'no-cache',
+                'Connection': 'keep-alive',
+                'X-Chat-Session-ID': chat_session
+            }
+        )
     
     except Exception as e:
         return jsonify({

@@ -918,7 +918,13 @@
     bubble.className = 'message-bubble';
     bubble.textContent = text;
     messageDiv.appendChild(bubble);
-    messagesList.appendChild(messageDiv);
+
+    const typingIndicator = document.getElementById('typingIndicator');
+    if (typingIndicator) {
+      messagesList.insertBefore(messageDiv, typingIndicator);
+    } else {
+      messagesList.appendChild(messageDiv);
+    }
 
     document.querySelector('.empty-state').style.display = 'none';
     setTimeout(() => { chatContent.scrollTop = chatContent.scrollHeight; }, 100);
@@ -1329,9 +1335,8 @@
         })
       });
 
-      hideTyping();
-
       if (!response.ok) {
+        hideTyping();
         addMessage('Sorry, I encountered an error. Please try again.', false);
         return;
       }
@@ -1361,7 +1366,8 @@
         chatContent.scrollTop = chatContent.scrollHeight;
       }
 
-      // Remove cursor when done
+      // Hide the sun and remove cursor when done
+      hideTyping();
       if (botBubble) botBubble.classList.remove('streaming-text');
 
     } catch (error) {
