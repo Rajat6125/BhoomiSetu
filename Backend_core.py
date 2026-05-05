@@ -1,4 +1,4 @@
-from flask import Flask, request, jsonify, Response, stream_with_context
+from flask import Flask, request, jsonify
 from supabase import create_client
 from flask_cors import CORS
 from dotenv import load_dotenv
@@ -301,28 +301,34 @@ def chat():
                 "error": "message is required"
             }), 400
 
-        chat_session = data.get("chat_session") or str(uuid.uuid4())
-        
-        @stream_with_context
-        def generate():
-            # Force an immediate flush to bypass browser/proxy buffering
-            yield "data: \n\n" 
-            for chunk in chat_service.continue_chat_stream(chat_session, data["message"]):
-                if chunk:
-                    # SSE format: "data: <content>\n\n"
-                    yield f"data: {chunk}\n\n"
-            yield "data: [DONE]\n\n"
+        chat_session = data.get("chat_session")
 
-        return Response(
-            generate(),
-            mimetype='text/event-stream',
-            headers={
-                'X-Accel-Buffering': 'no',
-                'Cache-Control': 'no-cache, no-transform',
-                'Connection': 'keep-alive',
-                'X-Chat-Session-ID': chat_session
-            }
-        )
+        if not chat_session or chat_session not in chat_service.sessions:
+            session_id = chat_session or str(uuid.uuid4())
+            general_prompt = f"""
+You are BhoomiSetu AI, a helpful and friendly agricultural assistant for Indian farmers.
+Answer the following question in simple, practical language.
+If the question is not farming-related, gently redirect to farming topics.
+
+Question: {data['message']}
+"""
+            chat = chat_service.model.start_chat(history=[])
+            response = chat.send_message(general_prompt)
+            chat_service.sessions[session_id] = chat
+
+            return jsonify({
+                "success": True,
+                "reply": response.text,
+                "chat_session": session_id
+            })
+
+        # Existing session — continue normally
+        reply = chat_service.continue_chat(chat_session, data["message"])
+        
+        return jsonify({
+            "success": True,
+            "reply": reply
+        })
     
     except Exception as e:
         return jsonify({

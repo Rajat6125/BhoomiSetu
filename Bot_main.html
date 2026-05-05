@@ -744,23 +744,9 @@
     pointer-events: none;
   }
 
-  /* ════════ STREAMING TEXT EFFECT ════════ */
-  .streaming-text::after {
-    content: '▊';
-    margin-left: 2px;
-    color: #ff9d42;
-    animation: blink 0.8s step-end infinite;
-  }
-
-  @keyframes blink {
-    from, to { opacity: 1; }
-    50% { opacity: 0; }
-  }
-
-  .message.bot .message-bubble {
-    position: relative;
-    transition: all 0.2s ease;
-  }
+  /* ════════ SUBTLE ENHANCEMENTS ════════ */
+  ::selection { background: #ff9d42; color: #ffffff; }
+  :focus-visible { outline: 2px solid #ff9d42; outline-offset: 2px; }
 </style>
 </head>
 <body>
@@ -878,8 +864,7 @@
     addElement(wrap);
   }
 
-  // const BASE_URL = 'https://bhoomisetu-t4nw.onrender.com';
-  const BASE_URL = 'http://127.0.0.1:10000';
+  const BASE_URL = 'https://bhoomisetu-t4nw.onrender.com';
   let currentChatSession = null;
 
   /* ── Auth helpers ───────────────────────────────────── */
@@ -895,13 +880,6 @@
 
   /* ── addMessage ─────────────────────────────────────── */
   function addMessage(text, isUser) {
-    if (Array.isArray(text)) {
-      text.forEach((part, index) => {
-        setTimeout(() => addMessage(part, isUser), index * 800);
-      });
-      return null;
-    }
-
     if (!isUser && messagesList.children.length === 0) {
       const gifDiv = document.createElement('div');
       gifDiv.style.textAlign = 'center';
@@ -919,17 +897,10 @@
     bubble.className = 'message-bubble';
     bubble.textContent = text;
     messageDiv.appendChild(bubble);
-
-    const typingIndicator = document.getElementById('typingIndicator');
-    if (typingIndicator) {
-      messagesList.insertBefore(messageDiv, typingIndicator);
-    } else {
-      messagesList.appendChild(messageDiv);
-    }
+    messagesList.appendChild(messageDiv);
 
     document.querySelector('.empty-state').style.display = 'none';
     setTimeout(() => { chatContent.scrollTop = chatContent.scrollHeight; }, 100);
-    return bubble;
   }
 
   /* ── addElement ─────────────────────────────────────── */
@@ -1336,55 +1307,15 @@
         })
       });
 
-      if (!response.ok) {
-        hideTyping();
-        addMessage('Sorry, I encountered an error. Please try again.', false);
-        return;
-      }
-
-      // Get session ID from header
-      const sessionHeader = response.headers.get('X-Chat-Session-ID');
-      if (sessionHeader) currentChatSession = sessionHeader;
-
-      const reader = response.body.getReader();
-      const decoder = new TextDecoder();
-      let botBubble = null;
-      let fullText = "";
-      let buffer = "";
-
-      while (true) {
-        const { done, value } = await reader.read();
-        if (done) break;
-
-        buffer += decoder.decode(value, { stream: true });
-
-        // Parse SSE lines: "data: <content>\n\n"
-        const lines = buffer.split("\n");
-        buffer = lines.pop(); // keep incomplete last line
-
-        for (const line of lines) {
-          if (!line.startsWith("data: ")) continue;
-          const content = line.slice(6); // strip "data: "
-          if (content === "[DONE]") continue;
-          if (!content) continue;
-
-          // Hide typing indicator and create bubble on first real chunk
-          if (!botBubble) {
-            hideTyping();
-            botBubble = addMessage("", false);
-            botBubble.classList.add('streaming-text');
-          }
-
-          botBubble.textContent += content;
-          fullText += content;
-          chatContent.scrollTop = chatContent.scrollHeight;
-        }
-      }
-
-      // Remove streaming cursor when done
       hideTyping();
-      if (botBubble) botBubble.classList.remove('streaming-text');
 
+      if (response.ok) {
+        const data = await response.json();
+        const botResponse = data.reply || data.response || data.message || 'I understood your message. How can I help further?';
+        addMessage(botResponse, false);
+      } else {
+        addMessage('Sorry, I encountered an error. Please try again.', false);
+      }
     } catch (error) {
       hideTyping();
       console.error('Error:', error);
