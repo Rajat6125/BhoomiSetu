@@ -744,9 +744,23 @@
     pointer-events: none;
   }
 
-  /* ════════ SUBTLE ENHANCEMENTS ════════ */
-  ::selection { background: #ff9d42; color: #ffffff; }
-  :focus-visible { outline: 2px solid #ff9d42; outline-offset: 2px; }
+  /* ════════ STREAMING TEXT EFFECT ════════ */
+  .streaming-text::after {
+    content: '▊';
+    margin-left: 2px;
+    color: #ff9d42;
+    animation: blink 0.8s step-end infinite;
+  }
+
+  @keyframes blink {
+    from, to { opacity: 1; }
+    50% { opacity: 0; }
+  }
+
+  .message.bot .message-bubble {
+    position: relative;
+    transition: all 0.2s ease;
+  }
 </style>
 </head>
 <body>
@@ -880,6 +894,13 @@
 
   /* ── addMessage ─────────────────────────────────────── */
   function addMessage(text, isUser) {
+    if (Array.isArray(text)) {
+      text.forEach((part, index) => {
+        setTimeout(() => addMessage(part, isUser), index * 800);
+      });
+      return null;
+    }
+
     if (!isUser && messagesList.children.length === 0) {
       const gifDiv = document.createElement('div');
       gifDiv.style.textAlign = 'center';
@@ -901,6 +922,7 @@
 
     document.querySelector('.empty-state').style.display = 'none';
     setTimeout(() => { chatContent.scrollTop = chatContent.scrollHeight; }, 100);
+    return bubble;
   }
 
   /* ── addElement ─────────────────────────────────────── */
@@ -1309,13 +1331,39 @@
 
       hideTyping();
 
-      if (response.ok) {
-        const data = await response.json();
-        const botResponse = data.reply || data.response || data.message || 'I understood your message. How can I help further?';
-        addMessage(botResponse, false);
-      } else {
+      if (!response.ok) {
         addMessage('Sorry, I encountered an error. Please try again.', false);
+        return;
       }
+
+      // Get session ID from header
+      const sessionHeader = response.headers.get('X-Chat-Session-ID');
+      if (sessionHeader) currentChatSession = sessionHeader;
+
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder();
+      let botBubble = null;
+      let fullText = "";
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+
+        const chunk = decoder.decode(value, { stream: true });
+        
+        if (!botBubble) {
+          botBubble = addMessage("", false);
+          botBubble.classList.add('streaming-text');
+        }
+
+        botBubble.textContent += chunk;
+        fullText += chunk;
+        chatContent.scrollTop = chatContent.scrollHeight;
+      }
+
+      // Remove cursor when done
+      if (botBubble) botBubble.classList.remove('streaming-text');
+
     } catch (error) {
       hideTyping();
       console.error('Error:', error);

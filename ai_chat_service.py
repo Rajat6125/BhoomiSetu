@@ -104,6 +104,58 @@ class FarmAdvisorChat:
         return parts  # returns list of short messages
 
 
+    def ask_model_stream(self, session_id, user_prompt):
+        # Initialize session with system prompt if needed
+        if session_id not in self.sessions:
+            self.sessions[session_id] = [
+                {
+                    "role": "system",
+                    "content": (
+                        "You are a helpful agricultural advisor for farmers.\n\n"
+                        "RESPONSE GUIDELINES:\n"
+                        "• Keep answers SHORT and MEANINGFUL: 2-3 sentences max for direct questions\n"
+                        "• Be DIRECT: Answer immediately, no fluff or extra explanation\n"
+                        "• Use SIMPLE language: Explain like talking to a farmer, not textbooks\n"
+                        "• Include DATA when relevant: Numbers, measurements, percentages, specific recommendations\n"
+                        "• Use emojis sparingly (max 1-2 per response) to add warmth only\n"
+                        "• FORMATTING: Use plain text only. NO markdown symbols like **text** or __text__.\n"
+                    )
+                }
+            ]
+
+        # Add user message
+        self.sessions[session_id].append({"role": "user", "content": user_prompt})
+
+        # Create stream
+        response = client.chat.completions.create(
+            model=self.model,
+            messages=self.sessions[session_id][-6:],
+            temperature=0.5,
+            max_tokens=250,
+            stream=True
+        )
+
+        full_reply = ""
+        for chunk in response:
+            if chunk.choices[0].delta.content:
+                content = chunk.choices[0].delta.content
+                full_reply += content
+                yield content
+
+        # Save the full response to session history
+        self.sessions[session_id].append({"role": "assistant", "content": full_reply})
+
+    def continue_chat_stream(self, session_id, user_message):
+        """
+        Continue existing chat session with follow-up questions (streaming)
+        """
+        if session_id not in self.sessions:
+            # Fallback to initializing a new session if not found
+            return self.ask_model_stream(session_id, user_message)
+
+        return self.ask_model_stream(session_id, user_message)
+
+
     def _clean_markdown(self, text):
         """Remove markdown symbols that might interfere with display"""
         # Remove bold (**text**)
@@ -139,6 +191,8 @@ ANSWER BRIEFLY (plain text, no bold):
 
 Keep it SHORT and MEANINGFUL. Use plain text only.
 """
+        # Note: Keeping this non-streaming for now as it's used in special forms
+        # but we could stream it too if needed.
         return self.ask_model(session_id, prompt)
 
 
